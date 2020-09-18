@@ -7,6 +7,7 @@ This project serves as the core of Deflect, several componenet is integrated wit
 1. Python 3.6.10
 2. Django 3.1
 3. Django REST framework 3.11.1
+4. MySQL 5.7 or above (JSON field)
 
 ## Install (dev)
 
@@ -21,7 +22,12 @@ python setup.py install
 cd ..
 pip install -r requirements.txt
 
+# Edit .env to config database
+cp core/.env.example core/.env
+vim core/.env
+
 # Create super user for django
+python manage.py migrate
 python manage.py createsuperuser --email admin@example.com --username admin
 ```
 
