@@ -17,9 +17,9 @@ import environ
 env = environ.Env(
     ALLOWED_HOSTS=(list, [])
 )
-ENV_PATH = None
-if 'ENV_PATH' in os.environ:
-    ENV_PATH = os.environ['ENV_PATH']
+
+# Use .env.ci instead of .env during CI test
+ENV_PATH = os.environ['ENV_PATH'] if 'ENV_PATH' in os.environ else None
 environ.Env.read_env(env_file=ENV_PATH)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
