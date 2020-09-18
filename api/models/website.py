@@ -31,7 +31,7 @@ class Website(models.Model):
     id = models.AutoField(primary_key=True)
 
     # url = db.Column(db.String(255), unique=True, nullable=False)
-    url = models.CharField(max_length=10, unique=True, null=False)
+    url = models.CharField(max_length=255, unique=True, null=False)
 
     # status = db.Column(db.Float, default=0, nullable=False)
     status = models.FloatField(default=0, null=False)

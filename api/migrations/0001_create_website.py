@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name='Website',
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('url', models.CharField(max_length=10, unique=True)),
+                ('url', models.CharField(max_length=255, unique=True)),
                 ('status', models.FloatField(default=0)),
                 ('ip_address', models.CharField(max_length=16)),
                 ('hidden_domain', models.CharField(default=api.models.website.generate_hidden_domain, max_length=32)),
