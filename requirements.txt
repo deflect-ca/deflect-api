@@ -20,6 +20,7 @@ lazy-object-proxy==1.4.3
 Markdown==3.2.2
 MarkupSafe==2.0.0a1
 mccabe==0.6.1
+mysqlclient==2.0.1
 parso==0.7.1
 pexpect==4.8.0
 pickleshare==0.7.5
