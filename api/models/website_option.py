@@ -20,4 +20,6 @@ class WebsiteOption(Model):
     data = models.JSONField(null=True)
 
     # one-to-many with website
-    website = models.ForeignKey('Website', on_delete=models.CASCADE)
+    # access website.options to get all options
+    website = models.ForeignKey('Website',
+        on_delete=models.CASCADE, related_name='options')
