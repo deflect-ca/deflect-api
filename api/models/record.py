@@ -8,7 +8,6 @@ class Record(models.Model):
     class Meta:
         app_label = "api"
 
-
     # id = db.Column(db.Integer, primary_key=True)
     id = models.AutoField(primary_key=True)
 
@@ -39,4 +38,3 @@ class Record(models.Model):
 
     # ttl = db.Column(db.Integer, default=3600)
     ttl = models.IntegerField(default=3600)
-
