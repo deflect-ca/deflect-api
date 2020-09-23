@@ -5,6 +5,8 @@ I am literally less fond of no other code I have written.
 
 """
 
+from __future__ import absolute_import
+from __future__ import print_function
 import logging
 import time
 import os
@@ -21,6 +23,7 @@ from flask import current_app
 
 from deflectweb.database import db
 from deflectweb.models import Website, Stat, YamlDiff
+import six
 
 logger = logging.getLogger('gen_site_config')
 
@@ -86,7 +89,7 @@ def record_to_dicts(record, site):
     # type changed to A records (but staying pointing to a hostname) -- to no avail.
     if record_type == "A":
         try:
-            ipaddress.ip_address(unicode(value))  # this raises ValueError if it can't parse an IP
+            ipaddress.ip_address(six.text_type(value))  # this raises ValueError if it can't parse an IP
         except ValueError:
             logger.debug("Skipping %s record %s with value %s", record_type, hostname, value)
             return {}
@@ -101,7 +104,7 @@ def parse_site_record_data(site):
     """
     dns_records = {}
     for record in sorted(site.records, key=attrgetter("type")):
-        for hostname, d in record_to_dicts(record, site).iteritems():
+        for hostname, d in six.iteritems(record_to_dicts(record, site)):
             dns_records.setdefault(hostname, [])
             dns_records[hostname].append(d)
     return dns_records
@@ -145,18 +148,18 @@ def valid_brb(brb):
       }
     }
     """
-    if not isinstance(brb.get("hits_per_interval"), (int, long)):
+    if not isinstance(brb.get("hits_per_interval"), six.integer_types):
         return False
-    if not isinstance(brb.get("interval"), (int, long)):
+    if not isinstance(brb.get("interval"), six.integer_types):
         return False
     if not isinstance(brb.get("regex"), dict):
         return False
     regex = brb["regex"]
-    if not isinstance(regex.get("method"), (str, unicode)):
+    if not isinstance(regex.get("method"), (str, six.text_type)):
         return False
-    if not isinstance(regex.get("ua"), (str, unicode)):
+    if not isinstance(regex.get("ua"), (str, six.text_type)):
         return False
-    if not isinstance(regex.get("url"), (str, unicode)):
+    if not isinstance(regex.get("url"), (str, six.text_type)):
         return False
     return True
 
@@ -356,7 +359,7 @@ def merge_subsite_records_under_parent(datadict, dumb_subsites, debug):
                 logger.info("DNS suffix for %s is %s", site_url, suffix)
 
             # Subsite records override all parent records with the same label if records exist
-            for record, values in subsite_dns_records.iteritems():
+            for record, values in six.iteritems(subsite_dns_records):
                 if not record or record == "@":
                     record = suffix
                 else:
@@ -474,7 +477,7 @@ def write_config_if_changed(new_config_dict, output_directory, debug):
         return
     else:
         logger.info("Site changes detected.")
-    print "Deflect dashboard configuration updated"
+    print("Deflect dashboard configuration updated")
 
     if debug:
         return
@@ -524,7 +527,7 @@ def setup_logging(debug):
 def partition_dnets(partition_config, unsplit_dict):
     dnet_to_partition = invert_partition_config(partition_config)
     partition_to_sites = {}
-    for site_url, site_config in unsplit_dict.iteritems():
+    for site_url, site_config in six.iteritems(unsplit_dict):
         if site_config["network"] not in dnet_to_partition:
             raise ValueError("dnet %s not assigned to a partition" % site_config["network"])
         partition = dnet_to_partition[site_config["network"]]
@@ -536,7 +539,7 @@ def partition_dnets(partition_config, unsplit_dict):
 
 def invert_partition_config(partition_to_config):
     dnet_to_partition = {}
-    for partition, partition_config in partition_to_config.iteritems():
+    for partition, partition_config in six.iteritems(partition_to_config):
         for dnet in partition_config["dnets"]:
             if dnet in dnet_to_partition:
                 raise ValueError("dnet can only belong to one partition")
@@ -561,7 +564,7 @@ def main(output_location, blacklist_file, debug=False):
 
     partition_config = current_app.config["GSC_PARTITIONS"]
     partition_to_sites = partition_dnets(partition_config, all_data)
-    for partition, sites in partition_to_sites.iteritems():
+    for partition, sites in six.iteritems(partition_to_sites):
         logger.error("number of sites in partition '%s': %s", partition, len(sites))
         write_config_if_changed(sites, os.path.join(output_location, partition), debug)
     return True
