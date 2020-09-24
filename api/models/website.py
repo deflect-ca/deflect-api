@@ -62,3 +62,25 @@ class Website(models.Model):
     # created = db.Column(db.DateTime, default=datetime.utcnow)
     created_at = models.DateTimeField(auto_now_add=True, editable=True)
     updated_at = models.DateTimeField(auto_now=True, editable=True)
+
+    def get_option(self, key):
+        option = self.options.filter(name=key).first()
+        return None if option is None else option.data.get('data')
+
+    def set_option(self, key, value):
+        option = self.options.filter(name=key)
+        data = {'data': value}
+
+        if option is None:
+            self.options.create(name=key, data=data)
+        else:
+            option.update(data=data)
+
+        return True
+
+    def list_option(self):
+        all_options = self.options.all()
+        dic = {}
+        for options in all_options:
+            dic[options.name] = options.data.get('data')
+        return dic
