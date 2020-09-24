@@ -5,9 +5,15 @@ I am literally less fond of no other code I have written.
 """
 
 import os
+import math
+import time
+import glob
+import yaml
+import ntpath
 import logging
 import ipaddress
 from operator import attrgetter
+from six import reraise as raise_
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -33,7 +39,7 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '-d', '--debug',
-            default=settings.DEBUG,
+            default=False,
             action='store_true',
             help='Debug mode'
         )
@@ -56,12 +62,11 @@ class Command(BaseCommand):
         all_data = self.generate_site_file(blacklist_path, debug)
         logging.debug(all_data)
 
-
-        #TODO: partition_config = settings.GSC_PARTITIONS
-        #TODO: partition_to_sites = self.partition_dnets(partition_config, all_data)
-        #TODO: for partition, sites in partition_to_sites.items():
-        #TODO:     logging.error("number of sites in partition '%s': %s", partition, len(sites))
-        #TODO:     self.write_config_if_changed(sites, os.path.join(output_location, partition), debug)
+        partition_config = settings.GSC_PARTITIONS
+        partition_to_sites = self.partition_dnets(partition_config, all_data)
+        for partition, sites in partition_to_sites.items():
+            logging.error("number of sites in partition '%s': %s", partition, len(sites))
+            self.write_config_if_changed(sites, os.path.join(output_location, partition), debug)
 
 
     def generate_site_file(self, blacklist_path, debug):
@@ -356,7 +361,108 @@ class Command(BaseCommand):
         return dumb_subsites
 
     def partition_dnets(self, partition_config, unsplit_dict):
-        return {}
+        dnet_to_partition = self.invert_partition_config(partition_config)
+        partition_to_sites = {}
+        for site_url, site_config in six.iteritems(unsplit_dict):
+            if site_config["network"] not in dnet_to_partition:
+                raise ValueError("dnet %s not assigned to a partition" % site_config["network"])
+            partition = dnet_to_partition[site_config["network"]]
+            if partition not in partition_to_sites:
+                partition_to_sites[partition] = {}
+            partition_to_sites[partition][site_url] = site_config
+        return partition_to_sites
+
+    def invert_partition_config(self, partition_to_config):
+        dnet_to_partition = {}
+        for partition, partition_config in six.iteritems(partition_to_config):
+            for dnet in partition_config["dnets"]:
+                if dnet in dnet_to_partition:
+                    raise ValueError("dnet can only belong to one partition")
+                dnet_to_partition[dnet] = partition
+        return dnet_to_partition
 
     def write_config_if_changed(self, new_config_dict, output_directory, debug):
-        pass
+        if not os.path.isdir(output_directory):
+            if 'TESTING' in os.environ:
+                os.mkdir(output_directory)
+            else:
+                raise RuntimeError(
+                    "Output directory %s not found, please mkdir it" % output_directory)
+
+        new_timestamp_ms = int(math.floor(time.time() * 1000))  # goes in the file
+        new_timestamp_s = int(new_timestamp_ms / 1000)  # goes in the filename
+
+        new_filename = settings.GSC_OUTPUT_FILE.format(new_timestamp_s)
+        new_filepath = os.path.abspath(os.path.join(output_directory, new_filename))
+
+        logging.debug(output_directory)
+        logging.debug(new_filepath)
+
+        maybe_old_filepath = self.get_most_recent_config(output_directory)
+        if maybe_old_filepath:
+            old_timestamp_s = self.filepath_to_timestamp(maybe_old_filepath)
+        else:
+            old_timestamp_s = new_timestamp_s - 1  # white lie? XXX
+
+        new_config_dict = {"remap": new_config_dict, "timestamp": new_timestamp_ms}
+        new_config_dict = yaml.load(yaml.safe_dump(new_config_dict), Loader=yaml.FullLoader)  # unicode vs str diffs otherwise
+        old_config_dict = None
+        if maybe_old_filepath:
+            with open(maybe_old_filepath) as f:
+                old_config_dict = yaml.load(f)
+        else:
+            old_config_dict = new_config_dict  # white lie? XXX
+
+        # TODO: Stat/YamlDiff
+        # compute it now for the diff to see if we should proceed, but save() later
+        # yaml_diff = YamlDiff(old_timestamp_s, new_timestamp_s,
+        #                    old_config_dict, new_config_dict,
+        #                    output_directory)
+        if not maybe_old_filepath:
+            logging.info("First run in this output directory.")
+        # elif yaml_diff.diff == {}:
+        #     logging.info("No site changes detected.")
+        #     return
+        else:
+            logging.info("Site changes detected.")
+
+        logging.info("Deflect dashboard configuration updated")
+
+        if debug:
+            return
+
+        new_config_yaml = yaml.safe_dump(new_config_dict, default_flow_style=False)
+        with open(new_filepath, "w") as f:
+            f.write(new_config_yaml)
+
+        if os.path.exists(os.path.join(output_directory, "site.yml")):
+            os.remove(os.path.join(output_directory, "site.yml"))
+
+        os.symlink(new_filepath, os.path.join(output_directory, "site.yml"))
+
+        logging.info("Generated updated site.yml at %s", new_filepath)
+
+        # TODO: Stat/YamlDiff
+        # try:
+        #     Stat(new_timestamp_s, new_config_dict, output_directory).save()
+        #     logger.info("Saved Stat for %s" % new_timestamp_s)
+        #     yaml_diff.save()
+        #     logger.info("Saved YamlDiff for %s" % new_timestamp_s)
+        # except Exception:
+        #     logger.error("Something wrong with Stat or YamlDiff")
+        #     logger.error("%s" % traceback.format_exc())
+
+    def get_most_recent_config(self, output_location):
+        configs = sorted(glob.glob(output_location + "/*.site.yml"))
+        if configs:
+            return configs[-1]
+        else:
+            return None
+
+    def filepath_to_timestamp(self, filepath):
+        maybe_timestamp = ntpath.basename(filepath).split(".")[0]
+        try:
+            int(maybe_timestamp)
+        except ValueError:
+            raise_(RuntimeError("filename has no timestamp? '%s'" % filepath), None)
+        return maybe_timestamp

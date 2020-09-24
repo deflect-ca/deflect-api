@@ -129,3 +129,5 @@ tests/edgemanage/bind/*.zone
 tests/edgemanage/health/*.edgestore
 tests/edgemanage/state/*.state
 tests/edgemanage/tmp/*.live
+
+dev/gen_site_config/*/*.yml

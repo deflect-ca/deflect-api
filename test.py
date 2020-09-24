@@ -11,6 +11,7 @@ if __name__ == "__main__":
     env_file = os.path.join(pathlib.Path(__file__).parent.absolute(), 'core/.env.ci')
     os.environ['ENV_PATH'] = env_file
     os.environ['USE_SQLITE'] = 'yes'
+    os.environ['TESTING'] = 'CI'
     os.environ['DJANGO_SETTINGS_MODULE'] = 'core.settings'
     django.setup()
     TestRunner = get_runner(settings)
