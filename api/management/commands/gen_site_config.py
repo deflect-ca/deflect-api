@@ -53,13 +53,13 @@ class Command(BaseCommand):
         all_data = self.generate_site_file(blacklist_path, debug)
         logging.debug(all_data)
 
-        """
-        partition_config = settings.GSC_PARTITIONS
-        partition_to_sites = self.partition_dnets(partition_config, all_data)
-        for partition, sites in partition_to_sites.items():
-            logging.error("number of sites in partition '%s': %s", partition, len(sites))
-            self.write_config_if_changed(sites, os.path.join(output_location, partition), debug)
-        """
+
+        #TODO: partition_config = settings.GSC_PARTITIONS
+        #TODO: partition_to_sites = self.partition_dnets(partition_config, all_data)
+        #TODO: for partition, sites in partition_to_sites.items():
+        #TODO:     logging.error("number of sites in partition '%s': %s", partition, len(sites))
+        #TODO:     self.write_config_if_changed(sites, os.path.join(output_location, partition), debug)
+
 
     def generate_site_file(self, blacklist_path, debug):
         """
@@ -81,13 +81,13 @@ class Command(BaseCommand):
 
         # remove_orphans() should go first or the next ones will fail
         # trying to find missing parents
-        #datadict = remove_orphans(datadict, dumb_subsites, debug)
+        #TODO: datadict = remove_orphans(datadict, dumb_subsites, debug)
 
-        #datadict = child_sites_get_parent_network(datadict, dumb_subsites)
+        #TODO: datadict = child_sites_get_parent_network(datadict, dumb_subsites)
 
-        #datadict = remove_differently_owned_subsites(datadict, dumb_subsites)
+        #TODO: datadict = remove_differently_owned_subsites(datadict, dumb_subsites)
 
-        #datadict = merge_subsite_records_under_parent(datadict, dumb_subsites, debug)
+        #TODO: datadict = merge_subsite_records_under_parent(datadict, dumb_subsites, debug)
 
         return dict(datadict)
 
@@ -95,9 +95,14 @@ class Command(BaseCommand):
         """
         Creating yaml dict for a site
         """
-        # TODO: Limit the use of site.get_option, use site_options dict
         # Store dict of option for a site
         site_options = site.list_option()
+
+        # Replacement of site.options.get()
+        def safe_get_option(key, fallback=None):
+            if key in site_options:
+                return site_options[key]
+            return fallback
 
         site_dict = {"url": site.url}
 
@@ -109,10 +114,10 @@ class Command(BaseCommand):
 
         # Performed after all DNS record are parsed and added to `site_dict`
         # use_ssl should be True is SSL is enabled in the website control panel
-        site_dict["https"] = site.get_option("use_ssl") or False
+        site_dict["https"] = safe_get_option("use_ssl") or False
 
         # Always use a TLS http_type if HTTPS is enabled
-        http_type = site.get_option("https_option", "http")
+        http_type = safe_get_option("https_option", "http")
         # Override the current option only if set to "http" only:
         if site_dict["https"] and http_type == "http":
             http_type = "https"
@@ -124,19 +129,19 @@ class Command(BaseCommand):
             http_type = "http"
 
         site_dict["http_type"] = http_type
-        site_dict["letsencrypt"] = site.get_option("cert_issuer") == "letsencrypt"
-        site_dict["validate_tls"] = site.get_option("enforce_valid_ssl") or False
+        site_dict["letsencrypt"] = safe_get_option("cert_issuer") == "letsencrypt"
+        site_dict["validate_tls"] = safe_get_option("enforce_valid_ssl") or False
         # TODO: site_dict["origin_certificates"] = bool(site.certificates)
         # TODO: site_dict["email"] = site.creator.email
 
         # Include the filename for the user uploaded TLS certificate files.
-        if site.get_option("use_custom_ssl") and site.get_option("ssl_bundle_time"):
-            site_dict["tls_bundle"] = site.get_option("ssl_bundle_time")
+        if safe_get_option("use_custom_ssl") and safe_get_option("ssl_bundle_time"):
+            site_dict["tls_bundle"] = safe_get_option("ssl_bundle_time")
 
         # We default to saving visitor logs if option True, or option is not set
-        site_dict["disable_logging"] = (not site.get_option("save_visitor_logs", True))
+        site_dict["disable_logging"] = (not safe_get_option("save_visitor_logs", True))
         site_dict["origin"] = site.ip_address
-        site_dict["cache_time"] = int(site.get_option("cache_time", default_cache_time))
+        site_dict["cache_time"] = int(safe_get_option("cache_time", default_cache_time))
 
         # These are all ints and bools
         for option in ["allow_http_delete_push",
@@ -157,7 +162,7 @@ class Command(BaseCommand):
         # so I'm checking that here.
         for option in ["cachekey_param",
                     "origin_object"]:
-            maybe_value = site.get_option(option, False)
+            maybe_value = safe_get_option(option, False)
             if maybe_value and maybe_value != "":  # being extra explicit
                 site_dict[option] = site_options[option]
 
@@ -182,7 +187,7 @@ class Command(BaseCommand):
             if len(brbs) > 0:
                 site_dict["banjax_regex_banner"] = brbs
 
-        site_dict["network"] = site.get_option("network", default_network)
+        site_dict["network"] = safe_get_option("network", default_network)
 
         # XXX: Is hidden_domain used by Deflect?
         site_dict["hidden"] = site.hidden_domain.lower()
@@ -191,7 +196,7 @@ class Command(BaseCommand):
 
         # XXX: Maybe simplify so this is always a list
         banjax_path = (site.admin_key or "")
-        if len(site.get_option("banjax_path", [])) > 0:
+        if len(safe_get_option("banjax_path", [])) > 0:
             if banjax_path:
                 banjax_path = list(set(site_options["banjax_path"] + [banjax_path]))
             else:
@@ -199,12 +204,12 @@ class Command(BaseCommand):
 
         site_dict["banjax_path"] = banjax_path
 
-        site_dict["banjax_sha_inv"] = site.get_option("banjax_sha_inv", False)
-        site_dict["banjax_captcha"] = site.get_option("banjax_captcha", False)
-        site_dict["user_banjax_sha_inv"] = site.get_option("user_banjax_sha_inv", False)
+        site_dict["banjax_sha_inv"] = safe_get_option("banjax_sha_inv", False)
+        site_dict["banjax_captcha"] = safe_get_option("banjax_captcha", False)
+        site_dict["user_banjax_sha_inv"] = safe_get_option("user_banjax_sha_inv", False)
 
-        site_dict["ns_on_deflect"] = site.get_option("ns_on_deflect", False)
-        site_dict["ns_monitoring_disabled"] = site.get_option("ns_monitoring_disabled", False)
+        site_dict["ns_on_deflect"] = safe_get_option("ns_on_deflect", False)
+        site_dict["ns_monitoring_disabled"] = safe_get_option("ns_monitoring_disabled", False)
 
         if site.ats_purge_secret:
             site_dict["ats_purge_secret"] = site.ats_purge_secret
