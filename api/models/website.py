@@ -63,20 +63,26 @@ class Website(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=True)
     updated_at = models.DateTimeField(auto_now=True, editable=True)
 
-    def get_option(self, key):
+    def get_option(self, key, fallback=None):
         option = self.options.filter(name=key).first()
-        return None if option is None else option.data.get('data')
+        if option is None and fallback is not None:
+            return fallback
+        elif option is None and fallback is None:
+            return None
+        return option.data.get('data')  # break json wrap
 
     def set_option(self, key, value):
-        option = self.options.filter(name=key)
-        data = {'data': value}
+        option = self.options.filter(name=key).first()
+        data = {'data': value}  # wrap with json
 
         if option is None:
-            self.options.create(name=key, data=data)
+            return self.options.create(name=key, data=data)
         else:
-            option.update(data=data)
+            return option.update(data=data)
 
-        return True
+    def set_bulk_options(self, obj):
+        for key in obj:
+            self.set_option(key, obj[key])
 
     def list_option(self):
         all_options = self.options.all()
