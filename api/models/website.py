@@ -84,3 +84,6 @@ class Website(models.Model):
         for options in all_options:
             dic[options.name] = options.data.get('data')
         return dic
+
+    def __repr__(self):
+        return '<Website #{} {}>'.format(self.id, self.url)
