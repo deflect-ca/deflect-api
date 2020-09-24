@@ -156,12 +156,18 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-        },
+        }
     },
     'root': {
         'handlers': ['console'],
         'level': 'DEBUG',
     },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+        }
+    }
 }
 
 REST_FRAMEWORK = {
@@ -182,3 +188,6 @@ GSC_OUTPUT_LOCATION = env('GSC_OUTPUT_LOCATION', default="/var/www/brainsconfig"
 GSC_PARTITIONS = {"part1": {"dnets": ["staging", "svoboda", "deflect1", "vz"]},
                   "part2": {"dnets": ["dnet1", "dnet2", "sv"]}}
 GSC_BLACKLIST_FILE = env('GSC_BLACKLIST_FILE', default='blacklist.txt')
+GSC_DEFAULT_CACHE_TIME = env('GSC_DEFAULT_CACHE_TIME', default=10)
+GSC_DEFAULT_NETWORK = env('GSC_DEFAULT_NETWORK', default='dnet1')
+GSC_REMAP_PURGE_DEFAULT_SECRET = "some-dummy-secret"
