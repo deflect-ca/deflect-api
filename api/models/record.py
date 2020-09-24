@@ -38,3 +38,7 @@ class Record(models.Model):
 
     # ttl = db.Column(db.Integer, default=3600)
     ttl = models.IntegerField(default=3600, null=True, blank=True)
+
+    def __repr__(self):
+        return '<Record id={} type={}, hostname={}>'.format(
+            self.id, self.type, self.hostname)

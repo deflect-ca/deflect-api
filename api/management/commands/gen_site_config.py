@@ -6,10 +6,13 @@ I am literally less fond of no other code I have written.
 
 import os
 import logging
-import six
+import ipaddress
+from operator import attrgetter
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+
+import six
 from api.models import Website
 
 
@@ -110,7 +113,7 @@ class Command(BaseCommand):
         default_network = settings.GSC_DEFAULT_NETWORK
 
         # Parse all DNS records for this site
-        # TODO: site_dict["dns_records"] = parse_site_record_data(site)
+        site_dict["dns_records"] = self.parse_site_record_data(site)
 
         # Performed after all DNS record are parsed and added to `site_dict`
         # use_ssl should be True is SSL is enabled in the website control panel
@@ -218,6 +221,87 @@ class Command(BaseCommand):
             site_dict["ats_purge_secret"] = settings.GSC_REMAP_PURGE_DEFAULT_SECRET
 
         return site_dict
+
+    def parse_site_record_data(self, site):
+        """
+        Read all DNS records for site and perform record validation
+        """
+        dns_records = {}
+        records = site.records.all()
+        for record in sorted(records, key=attrgetter("type")):
+            for hostname, d in six.iteritems(self.record_to_dicts(record, site)):
+                dns_records.setdefault(hostname, [])
+                dns_records[hostname].append(d)
+        return dns_records
+
+    def record_to_dicts(self, record, site):
+        """
+        Note the plural "dicts" because the MX -> A record thing returns two dicts.
+        """
+        dicts = {}
+        hostname = record.hostname.strip().strip(".")
+        site_url = site.url
+
+        if not hostname:
+            hostname = "@"
+
+        value = record.value.strip()
+        record_type = record.type
+
+        # We need to remap @ MX records that point to the root
+        # domain. We do this by creating MX records for something
+        # called "deflectmx" which is then set to be their MX.
+        if record_type == "MX" and value == "%s." % site_url:
+            dicts["deflectmx"] = {
+                "type": "A",
+                "value": site.ip_address
+            }
+            value = "deflectmx.%s." % site_url
+
+        if (record_type == "CNAME" and hostname == "mail" and
+                value in ["@", site_url, site_url + "."]):
+            record_type = "A"
+            value = site.ip_address
+
+        # TXT records generally need leading and trailing quotes
+        # They also need to be split if they are too long (see RFC4408, section 3.1.3)
+        if record_type == "TXT":
+            value = '"{}"'.format(value)
+
+        # Properly set up MX records - use the priority
+        if record_type == "MX":
+                # We now just use a priority column and not a TTL column
+            value = [int(record.priority), value]
+
+        # We need all the necessary parameters for a SRV records to be set, otherwise we ignore
+        if record_type == "SRV":
+            if all([hasattr(record, field) for field in ["priority", "weight", "port"]]):
+                value = [int(record.priority), int(record.weight), int(record.port), value]
+            else:
+                logging.info("Skipping SRV record %s for website %s due to missing "
+                            "parameters", hostname, site.url)
+                return {}
+
+        # Remove www. CNAME records, and A and NS records for the root. This is performed
+        # by autobrains when generating the zonefile. We should do it here to ensure
+        # new DNS code is producing the same clients.yml output
+        is_root = hostname in ["@", site_url, site_url + "."]
+        if (is_root and record_type in ["A", "NS"]) or hostname == "www":
+            logging.debug("Skipping %s record %s with value %s", record_type, hostname, value)
+            return {}
+
+        # XXX these invalid A records should not get this far, but they do. I've spent
+        # so much time trying to find where they come from -- CNAME records getting their
+        # type changed to A records (but staying pointing to a hostname) -- to no avail.
+        if record_type == "A":
+            try:
+                ipaddress.ip_address(value)  # this raises ValueError if it can't parse an IP
+            except ValueError:
+                logging.debug("Skipping %s record %s with value %s", record_type, hostname, value)
+                return {}
+
+        dicts[hostname] = {"type": record_type, "value": value}
+        return dicts
 
     def valid_brb(self, brb):
         """
