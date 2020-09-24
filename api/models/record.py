@@ -18,13 +18,13 @@ class Record(models.Model):
     hostname = models.CharField(max_length=255, null=False)
 
     # value = db.Column(db.Text(65000), nullable=False)
-    hostname = models.TextField(null=False)
+    value = models.TextField(null=False, default='')
 
     # priority = db.Column(db.Integer)
-    priority = models.IntegerField()
+    priority = models.IntegerField(null=True, blank=True)
 
     # weight = db.Column(db.Integer)
-    weight = models.IntegerField()
+    weight = models.IntegerField(null=True, blank=True)
 
     # website_id = db.Column(db.Integer, db.ForeignKey('websites.id'), nullable=False)
     website = models.ForeignKey('Website',
@@ -34,7 +34,7 @@ class Record(models.Model):
     deflect = models.BooleanField(default=False, null=False)
 
     # port = db.Column(db.Integer, default=None)
-    port = models.IntegerField(default=None, null=True)
+    port = models.IntegerField(default=None, null=True, blank=True)
 
     # ttl = db.Column(db.Integer, default=3600)
-    ttl = models.IntegerField(default=3600)
+    ttl = models.IntegerField(default=3600, null=True, blank=True)
