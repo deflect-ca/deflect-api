@@ -134,8 +134,8 @@ class Command(BaseCommand):
         site_dict["http_type"] = http_type
         site_dict["letsencrypt"] = safe_get_option("cert_issuer") == "letsencrypt"
         site_dict["validate_tls"] = safe_get_option("enforce_valid_ssl") or False
-        # TODO: site_dict["origin_certificates"] = bool(site.certificates)
-        # TODO: site_dict["email"] = site.creator.email
+        site_dict["origin_certificates"] = bool(site.certificates.all())
+        # site_dict["email"] = site.creator.email
 
         # Include the filename for the user uploaded TLS certificate files.
         if safe_get_option("use_custom_ssl") and safe_get_option("ssl_bundle_time"):

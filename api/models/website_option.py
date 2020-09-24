@@ -23,3 +23,6 @@ class WebsiteOption(Model):
     # access website.options to get all options
     website = models.ForeignKey('Website',
         on_delete=models.CASCADE, related_name='options')
+
+    def __repr__(self):
+        return '<WebsiteOption {}={}>'.format(self.name, self.data)
