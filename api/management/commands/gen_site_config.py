@@ -20,7 +20,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from six import reraise as raise_
 
-from api.models import Website, YamlDiff  # pylint: disable=no-name-in-module
+from api.models import Website, YamlDiff  # pylint: disable=no-name-in-module,import-error
 
 
 class Command(BaseCommand):
