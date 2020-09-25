@@ -60,7 +60,6 @@ class Command(BaseCommand):
             blacklist_path = blacklist_file
 
         all_data = self.generate_site_file(blacklist_path, debug)
-        logging.debug(all_data)
 
         partition_config = settings.GSC_PARTITIONS
         partition_to_sites = self.partition_dnets(partition_config, all_data)
@@ -115,7 +114,7 @@ class Command(BaseCommand):
                         "a good chance someone is doing something malicious between %s and %s!\n"
                         "WARNING!!!", datadict[parent_site_url]["email"],
                         datadict[site_url]["email"], parent_site_url, site_url)
-                    del(datadict[site_url])
+                    del datadict[site_url]
                     continue
         return datadict
 
@@ -164,11 +163,11 @@ class Command(BaseCommand):
                         clean_list.append(index)
 
                 for clean_elem in clean_list:
-                    del(datadict[parent_site_url]["dns_records"][suffix][clean_elem])
+                    del datadict[parent_site_url]["dns_records"][suffix][clean_elem]
 
                 # Delete the DNS records for the subsite but DON'T delete
                 # the banjax etc config
-                del(datadict[site_url]["dns_records"])
+                del datadict[site_url]["dns_records"]
         return datadict
 
     def child_sites_get_parent_network(self, datadict, dumb_subsites):
@@ -190,7 +189,7 @@ class Command(BaseCommand):
                     if debug:
                         logging.info("Found sub-site %s but not its parent %s. Is the parent "
                                     "blacklisted? Skipping sub-site!", site_url, parent_site_url)
-                    del(datadict[site_url])
+                    del datadict[site_url]
                     continue
         return datadict
 
@@ -329,9 +328,9 @@ class Command(BaseCommand):
         dns_records = {}
         records = site.records.all()
         for record in sorted(records, key=attrgetter("type")):
-            for hostname, d in six.iteritems(self.record_to_dicts(record, site)):
+            for hostname, data in six.iteritems(self.record_to_dicts(record, site)):
                 dns_records.setdefault(hostname, [])
-                dns_records[hostname].append(d)
+                dns_records[hostname].append(data)
         return dns_records
 
     def record_to_dicts(self, record, site):
@@ -490,23 +489,24 @@ class Command(BaseCommand):
         new_filename = settings.GSC_OUTPUT_FILE.format(new_timestamp_s)
         new_filepath = os.path.abspath(os.path.join(output_directory, new_filename))
 
-        logging.debug(output_directory)
-        logging.debug(new_filepath)
-
         maybe_old_filepath = self.get_most_recent_config(output_directory)
-        if maybe_old_filepath:
-            old_timestamp_s = self.filepath_to_timestamp(maybe_old_filepath)
-        else:
-            old_timestamp_s = new_timestamp_s - 1  # white lie? XXX
+        # if maybe_old_filepath:
+        #    old_timestamp_s = self.filepath_to_timestamp(maybe_old_filepath)
+        #else:
+        #    old_timestamp_s = new_timestamp_s - 1  # white lie? XXX
+
 
         new_config_dict = {"remap": new_config_dict, "timestamp": new_timestamp_ms}
-        new_config_dict = yaml.load(yaml.safe_dump(new_config_dict), Loader=yaml.FullLoader)  # unicode vs str diffs otherwise
-        old_config_dict = None
+        new_config_dict = yaml.load(
+            yaml.safe_dump(
+                new_config_dict), Loader=yaml.FullLoader)  # unicode vs str diffs otherwise
+        # old_config_dict = None
         if maybe_old_filepath:
             with open(maybe_old_filepath) as rfile:
                 old_config_dict = yaml.load(rfile, Loader=yaml.FullLoader)
         else:
-            old_config_dict = new_config_dict  # white lie? XXX
+            pass
+            # old_config_dict = new_config_dict  # white lie? XXX
 
         # TODO: Stat/YamlDiff
         # compute it now for the diff to see if we should proceed, but save() later
@@ -527,8 +527,8 @@ class Command(BaseCommand):
             return
 
         new_config_yaml = yaml.safe_dump(new_config_dict, default_flow_style=False)
-        with open(new_filepath, "w") as f:
-            f.write(new_config_yaml)
+        with open(new_filepath, "w") as wfile:
+            wfile.write(new_config_yaml)
 
         if os.path.exists(os.path.join(output_directory, "site.yml")):
             os.remove(os.path.join(output_directory, "site.yml"))
