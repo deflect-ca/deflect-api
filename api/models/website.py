@@ -43,10 +43,10 @@ class Website(models.Model):
     hidden_domain = models.CharField(max_length=32, null=False, default=generate_hidden_domain)
 
     # banjax_auth_hash = db.Column(db.String(255))
-    banjax_auth_hash = models.CharField(max_length=255, null=False, default='')
+    banjax_auth_hash = models.CharField(max_length=255, null=True, blank=True)
 
     # admin_key = db.Column(db.String(255))
-    admin_key = models.CharField(max_length=255, null=False, default='')
+    admin_key = models.CharField(max_length=255, null=True, blank=True)
 
     # under_attack = db.Column(db.Integer, default=0)
     under_attack = models.BooleanField(default=False)
@@ -57,11 +57,13 @@ class Website(models.Model):
     # ats_purge_secret = \
     #     db.Column(db.String(64), default=lambda: ''.join(
     #         random.choice(string.ascii_lowercase + string.ascii_uppercase) for _ in range(16)))
-    ats_purge_secret = models.CharField(max_length=64, default=generate_ats_purge_secret)
+    ats_purge_secret = \
+        models.CharField(
+            max_length=64, default=generate_ats_purge_secret, null=True, blank=True)
 
     # created = db.Column(db.DateTime, default=datetime.utcnow)
-    created_at = models.DateTimeField(auto_now_add=True, editable=True)
-    updated_at = models.DateTimeField(auto_now=True, editable=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def get_option(self, key, fallback=None):
         option = self.options.filter(name=key).first()
