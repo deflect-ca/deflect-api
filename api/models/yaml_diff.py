@@ -53,7 +53,7 @@ class YamlDiff(models.Model):
             diff=yaml.dump(diff),
             partition=partition)
 
-        return yaml_diff
+        return yaml_diff, diff
 
     def __repr__(self):
         return '<YamlDiff partition={}, epoch_time={}, prev_epoch_time={}, diff={}>'.\

@@ -508,13 +508,14 @@ class Command(BaseCommand):
             old_config_dict = new_config_dict  # white lie? XXX
 
         # compute it now for the diff to see if we should proceed, but save() later
-        yaml_diff = YamlDiff.create(old_timestamp_s, new_timestamp_s,
-                                    old_config_dict, new_config_dict,
-                                    output_directory)
+        yaml_diff, raw_diff = YamlDiff.create(
+            old_timestamp_s, new_timestamp_s,
+            old_config_dict, new_config_dict,
+            output_directory)
 
         if not maybe_old_filepath:
             logging.info("First run in this output directory.")
-        elif yaml_diff.diff == {}:
+        elif raw_diff == {}:
             logging.info("No site changes detected.")
             return
         else:
