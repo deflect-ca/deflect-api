@@ -4,22 +4,22 @@ A Django version of gen_site_config
 I am literally less fond of no other code I have written.
 """
 
-import os
-import math
-import time
 import glob
-import yaml
-import ntpath
-import logging
 import ipaddress
+import logging
+import math
+import ntpath
+import os
+import time
 from operator import attrgetter
-from six import reraise as raise_
-
-from django.conf import settings
-from django.core.management.base import BaseCommand
 
 import six
-from api.models import Website
+import yaml
+from django.conf import settings
+from django.core.management.base import BaseCommand
+from six import reraise as raise_
+
+from api.models import Website  # pylint: disable=no-name-in-module
 
 
 class Command(BaseCommand):
@@ -89,15 +89,110 @@ class Command(BaseCommand):
 
         # remove_orphans() should go first or the next ones will fail
         # trying to find missing parents
-        #TODO: datadict = remove_orphans(datadict, dumb_subsites, debug)
+        datadict = self.remove_orphans(datadict, dumb_subsites, debug)
 
-        #TODO: datadict = child_sites_get_parent_network(datadict, dumb_subsites)
+        datadict = self.child_sites_get_parent_network(datadict, dumb_subsites)
 
-        #TODO: datadict = remove_differently_owned_subsites(datadict, dumb_subsites)
+        # XXX: There is no more email field, comment this line for now
+        # datadict = self.remove_differently_owned_subsites(datadict, dumb_subsites)
 
-        #TODO: datadict = merge_subsite_records_under_parent(datadict, dumb_subsites, debug)
+        datadict = self.merge_subsite_records_under_parent(datadict, dumb_subsites, debug)
 
         return dict(datadict)
+
+    def remove_differently_owned_subsites(self, datadict, dumb_subsites):
+        for site_url in datadict.keys():
+            parent_site_get = dumb_subsites.get(site_url)
+
+            # Check if this is a subsite of another site `parent_site_get`
+            if parent_site_get:
+                # XXX these should exist because i'm assuming remove_orphans() goes first
+                parent_site_url = parent_site_get.get("parent")
+                parent_site_email = datadict[parent_site_url]["email"]
+                if parent_site_email != datadict[site_url]["email"]:
+                    logging.warning(
+                        "WARNING!!!!\nThe logins for site %s and %s do not match - there's "
+                        "a good chance someone is doing something malicious between %s and %s!\n"
+                        "WARNING!!!", datadict[parent_site_url]["email"],
+                        datadict[site_url]["email"], parent_site_url, site_url)
+                    del(datadict[site_url])
+                    continue
+        return datadict
+
+    def merge_subsite_records_under_parent(self, datadict, dumb_subsites, debug):
+        for site_url in datadict.keys():
+            parent_site_get = dumb_subsites.get(site_url)
+
+            # Check if this is a subsite of another site `parent_site_get`
+            if parent_site_get:
+                # XXX this should exist because i'm assuming remove_orphans() goes first
+                parent_site_url = parent_site_get.get("parent")
+
+                if debug:
+                    logging.info("Site %s is a subsite of %s", site_url, parent_site_url)
+
+                subsite_dns_records = datadict[site_url]["dns_records"]
+                suffix = site_url.partition(parent_site_url)[0].strip(".")
+                if debug:
+                    logging.info("DNS suffix for %s is %s", site_url, suffix)
+
+                # Subsite records override all parent records with the same label if records exist
+                for record, values in six.iteritems(subsite_dns_records):
+                    if not record or record == "@":
+                        record = suffix
+                    else:
+                        record = record + "." + suffix
+                    datadict[parent_site_url]["dns_records"][record] = values
+                else:
+                    # Even if subsite has no records, remove parent records for the subsite name
+                    datadict[parent_site_url]["dns_records"][suffix] = []
+
+                # This adds a CNAME record for every subsite base domain to the parent domain
+                # e.g adds a blog.example.com CNAME record pointing to example.com.
+                datadict[parent_site_url]["dns_records"].setdefault(suffix, [])
+                datadict[parent_site_url]["dns_records"][suffix].append({
+                    "type": "CNAME",
+                    "value": parent_site_url + "."
+                })
+
+                # This block is concerned with cleaning any existing A
+                # records to ensure that we deflect-protect existing
+                # sites.
+                clean_list = []
+                for index, record in enumerate(datadict[parent_site_url]["dns_records"][suffix]):
+                    if record["type"] == "A":
+                        clean_list.append(index)
+
+                for clean_elem in clean_list:
+                    del(datadict[parent_site_url]["dns_records"][suffix][clean_elem])
+
+                # Delete the DNS records for the subsite but DON'T delete
+                # the banjax etc config
+                del(datadict[site_url]["dns_records"])
+        return datadict
+
+    def child_sites_get_parent_network(self, datadict, dumb_subsites):
+        for site_url in datadict.keys():
+            maybe_parent_site = dumb_subsites.get(site_url)
+            if maybe_parent_site:
+                parent_url = maybe_parent_site["parent"]
+                datadict[site_url]["network"] = datadict[parent_url]["network"]
+        return datadict
+
+    def remove_orphans(self, datadict, dumb_subsites, debug):
+        for site_url in datadict.keys():
+            parent_site_get = dumb_subsites.get(site_url)
+
+            # Check if this is a subsite of another site `parent_site_get`
+            if parent_site_get:
+                parent_site_url = parent_site_get.get("parent")
+                if parent_site_url not in datadict:
+                    if debug:
+                        logging.info("Found sub-site %s but not its parent %s. Is the parent "
+                                    "blacklisted? Skipping sub-site!", site_url, parent_site_url)
+                    del(datadict[site_url])
+                    continue
+        return datadict
 
     def dict_for_site(self, site):
         """
@@ -408,8 +503,8 @@ class Command(BaseCommand):
         new_config_dict = yaml.load(yaml.safe_dump(new_config_dict), Loader=yaml.FullLoader)  # unicode vs str diffs otherwise
         old_config_dict = None
         if maybe_old_filepath:
-            with open(maybe_old_filepath) as f:
-                old_config_dict = yaml.load(f)
+            with open(maybe_old_filepath) as rfile:
+                old_config_dict = yaml.load(rfile, Loader=yaml.FullLoader)
         else:
             old_config_dict = new_config_dict  # white lie? XXX
 
