@@ -11,6 +11,7 @@ import math
 import ntpath
 import os
 import time
+import traceback
 from operator import attrgetter
 
 import six
@@ -19,7 +20,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from six import reraise as raise_
 
-from api.models import Website  # pylint: disable=no-name-in-module
+from api.models import Website, YamlDiff  # pylint: disable=no-name-in-module
 
 
 class Command(BaseCommand):
@@ -490,34 +491,32 @@ class Command(BaseCommand):
         new_filepath = os.path.abspath(os.path.join(output_directory, new_filename))
 
         maybe_old_filepath = self.get_most_recent_config(output_directory)
-        # if maybe_old_filepath:
-        #    old_timestamp_s = self.filepath_to_timestamp(maybe_old_filepath)
-        #else:
-        #    old_timestamp_s = new_timestamp_s - 1  # white lie? XXX
-
+        if maybe_old_filepath:
+            old_timestamp_s = self.filepath_to_timestamp(maybe_old_filepath)
+        else:
+            old_timestamp_s = new_timestamp_s - 1  # white lie? XXX
 
         new_config_dict = {"remap": new_config_dict, "timestamp": new_timestamp_ms}
         new_config_dict = yaml.load(
             yaml.safe_dump(
                 new_config_dict), Loader=yaml.FullLoader)  # unicode vs str diffs otherwise
-        # old_config_dict = None
+        old_config_dict = None
         if maybe_old_filepath:
             with open(maybe_old_filepath) as rfile:
                 old_config_dict = yaml.load(rfile, Loader=yaml.FullLoader)
         else:
-            pass
-            # old_config_dict = new_config_dict  # white lie? XXX
+            old_config_dict = new_config_dict  # white lie? XXX
 
-        # TODO: Stat/YamlDiff
         # compute it now for the diff to see if we should proceed, but save() later
-        # yaml_diff = YamlDiff(old_timestamp_s, new_timestamp_s,
-        #                    old_config_dict, new_config_dict,
-        #                    output_directory)
+        yaml_diff = YamlDiff.create(old_timestamp_s, new_timestamp_s,
+                                    old_config_dict, new_config_dict,
+                                    output_directory)
+
         if not maybe_old_filepath:
             logging.info("First run in this output directory.")
-        # elif yaml_diff.diff == {}:
-        #     logging.info("No site changes detected.")
-        #     return
+        elif yaml_diff.diff == {}:
+            logging.info("No site changes detected.")
+            return
         else:
             logging.info("Site changes detected.")
 
@@ -526,7 +525,9 @@ class Command(BaseCommand):
         if debug:
             return
 
+        # Write YAML file and create sym link
         new_config_yaml = yaml.safe_dump(new_config_dict, default_flow_style=False)
+
         with open(new_filepath, "w") as wfile:
             wfile.write(new_config_yaml)
 
@@ -537,15 +538,18 @@ class Command(BaseCommand):
 
         logging.info("Generated updated site.yml at %s", new_filepath)
 
-        # TODO: Stat/YamlDiff
-        # try:
-        #     Stat(new_timestamp_s, new_config_dict, output_directory).save()
-        #     logger.info("Saved Stat for %s" % new_timestamp_s)
-        #     yaml_diff.save()
-        #     logger.info("Saved YamlDiff for %s" % new_timestamp_s)
-        # except Exception:
-        #     logger.error("Something wrong with Stat or YamlDiff")
-        #     logger.error("%s" % traceback.format_exc())
+        try:
+            # Stat(new_timestamp_s, new_config_dict, output_directory).save()
+            # logger.info("Saved Stat for %s" % new_timestamp_s)
+            logging.debug(yaml_diff.epoch_time)
+            logging.debug(yaml_diff.prev_epoch_time)
+            logging.debug(yaml_diff.diff)
+            logging.debug(yaml_diff.partition)
+            yaml_diff.save()
+            logging.info("Saved YamlDiff for %s" % new_timestamp_s)
+        except Exception:
+            logging.error("Something wrong with YamlDiff")
+            logging.error("%s" % traceback.format_exc())
 
     def get_most_recent_config(self, output_location):
         configs = sorted(glob.glob(output_location + "/*.site.yml"))

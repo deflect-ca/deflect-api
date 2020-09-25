@@ -1,3 +1,5 @@
+import yaml
+
 from django.db import models
 from yamlfield.fields import YAMLField
 from deepdiff import DeepDiff
@@ -48,10 +50,10 @@ class YamlDiff(models.Model):
         yaml_diff = cls(
             prev_epoch_time=old_timestamp,
             epoch_time=new_timestamp,
-            diff=diff,
+            diff=yaml.dump(diff),
             partition=partition)
 
-        return yaml_diff.diff
+        return yaml_diff
 
     def __repr__(self):
         return '<YamlDiff partition={}, epoch_time={}, prev_epoch_time={}, diff={}>'.\
