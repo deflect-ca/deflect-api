@@ -451,7 +451,7 @@ class Command(BaseCommand):
                     # checksite is a subsite of site
                     dumb_subsites[checksite.url] = {
                         "parent": site.url,
-                        "parent_creator_id": site.creator_id
+                        # parent_creator_id": site.creator_id
                     }
         return dumb_subsites
 
