@@ -1,8 +1,8 @@
 import json
 import logging
 
-from api.models import WebsiteOption
 from django.core.management.base import BaseCommand
+from api.models import WebsiteOption
 
 
 class Command(BaseCommand):

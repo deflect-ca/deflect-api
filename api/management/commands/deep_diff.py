@@ -1,5 +1,5 @@
-import yaml
 import logging
+import yaml
 
 from deepdiff import DeepDiff
 from django.core.management.base import BaseCommand
@@ -34,8 +34,6 @@ class Command(BaseCommand):
         with open(options['file1'], "r") as yaml_file1:
             yaml_1_raw = yaml_file1.read()
             yaml_1 = yaml.load(yaml_1_raw, Loader=yaml.FullLoader)
-            for i, l in enumerate(yaml_file1):
-                pass
 
         logging.info('wc -l = %d', len(yaml_1_raw.split("\n")))
 
@@ -43,8 +41,6 @@ class Command(BaseCommand):
         with open(options['file2'], "r") as yaml_file2:
             yaml_2_raw = yaml_file2.read()
             yaml_2 = yaml.load(yaml_2_raw, Loader=yaml.FullLoader)
-            for j, l in enumerate(yaml_file2):
-                pass
 
         logging.info('wc -l = %d', len(yaml_2_raw.split("\n")))
 
@@ -61,11 +57,10 @@ class Command(BaseCommand):
 
         if options['output'] is None:
             logging.info(deepdiff_yaml)
-            return
-
-        logging.info('Writing output to %s', options['output'])
-        with open(options['output'], "w") as output:
-            output.write(deepdiff_yaml)
+        else:
+            logging.info('Writing output to %s', options['output'])
+            with open(options['output'], "w") as output:
+                output.write(deepdiff_yaml)
 
         if deepdiff == {}:
             self.stdout.write(self.style.SUCCESS('file1 and file2 are identical'))
