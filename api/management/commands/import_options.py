@@ -25,7 +25,8 @@ class Command(BaseCommand):
         if len(json_arr) > 0:
             bulk_arr = []
             for w_option in json_arr:
-                logging.info('id = %d', w_option['id'])
+                logging.info('Insert %s => %s on site #%d',
+                    w_option['name'], w_option['data'], w_option['website_id'])
                 bulk_arr.append(WebsiteOption(
                     website_id=w_option['website_id'],
                     name=w_option['name'],

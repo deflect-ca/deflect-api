@@ -55,13 +55,17 @@ class Command(BaseCommand):
 
         logging.info('Executing deepdiff against the given file ...')
 
-        deepdiff = yaml.dump(dict(DeepDiff(
-            yaml_1["remap"], yaml_2["remap"], ignore_order=True)))
+        deepdiff = dict(DeepDiff(
+            yaml_1["remap"], yaml_2["remap"], ignore_order=True))
+        deepdiff_yaml = yaml.dump(deepdiff)
 
         if options['output'] is None:
-            logging.info(deepdiff)
+            logging.info(deepdiff_yaml)
             return
 
         logging.info('Writing output to %s', options['output'])
         with open(options['output'], "w") as output:
-            output.write(deepdiff)
+            output.write(deepdiff_yaml)
+
+        if deepdiff == {}:
+            self.stdout.write(self.style.SUCCESS('file1 and file2 are identical'))
