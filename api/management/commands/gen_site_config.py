@@ -317,7 +317,7 @@ class Command(BaseCommand):
         if site.ats_purge_secret:
             site_dict["ats_purge_secret"] = site.ats_purge_secret
         else:
-            logging.warning("XXX site %s has no ats_purge_secret", site.url)
+            # logging.warning("XXX site %s has no ats_purge_secret", site.url)
             site_dict["ats_purge_secret"] = settings.GSC_REMAP_PURGE_DEFAULT_SECRET
 
         return site_dict
@@ -441,6 +441,10 @@ class Command(BaseCommand):
         if site.status < 3 and site.status != -1:
             return False
 
+        # XXX Skip sites which have not been approved in Dashadmin
+        if not site.get_option("approved"):
+            return False
+
         return True
 
     def find_subsites(self, site_details):
@@ -542,15 +546,11 @@ class Command(BaseCommand):
         try:
             # Stat(new_timestamp_s, new_config_dict, output_directory).save()
             # logger.info("Saved Stat for %s" % new_timestamp_s)
-            logging.debug(yaml_diff.epoch_time)
-            logging.debug(yaml_diff.prev_epoch_time)
-            logging.debug(yaml_diff.diff)
-            logging.debug(yaml_diff.partition)
             yaml_diff.save()
-            logging.info("Saved YamlDiff for %s" % new_timestamp_s)
+            logging.info("Saved YamlDiff for %s", new_timestamp_s)
         except Exception:
             logging.error("Something wrong with YamlDiff")
-            logging.error("%s" % traceback.format_exc())
+            logging.error("%s", traceback.format_exc())
 
     def get_most_recent_config(self, output_location):
         configs = sorted(glob.glob(output_location + "/*.site.yml"))
