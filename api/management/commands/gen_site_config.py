@@ -94,14 +94,14 @@ class Command(BaseCommand):
         datadict = self.child_sites_get_parent_network(datadict, dumb_subsites)
 
         # XXX: There is no more email field, comment this line for now
-        # datadict = self.remove_differently_owned_subsites(datadict, dumb_subsites)
+        datadict = self.remove_differently_owned_subsites(datadict, dumb_subsites)
 
         datadict = self.merge_subsite_records_under_parent(datadict, dumb_subsites, debug)
 
         return dict(datadict)
 
     def remove_differently_owned_subsites(self, datadict, dumb_subsites):
-        for site_url in datadict.keys():
+        for site_url in list(datadict.keys()):
             parent_site_get = dumb_subsites.get(site_url)
 
             # Check if this is a subsite of another site `parent_site_get`
@@ -235,7 +235,7 @@ class Command(BaseCommand):
         site_dict["letsencrypt"] = safe_get_option("cert_issuer") == "letsencrypt"
         site_dict["validate_tls"] = safe_get_option("enforce_valid_ssl") or False
         site_dict["origin_certificates"] = bool(site.certificates.all())
-        # site_dict["email"] = site.creator.email
+        site_dict["email"] = safe_get_option("email")
 
         # Include the filename for the user uploaded TLS certificate files.
         if safe_get_option("use_custom_ssl") and safe_get_option("ssl_bundle_time"):
