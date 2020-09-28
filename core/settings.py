@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 
 import os
+import json
 import environ
 
 env = environ.Env(
@@ -185,8 +186,7 @@ REST_FRAMEWORK = {
 GSC_LOG_FILE = env('GSC_LOG_FILE', default="/var/tmp/gen_site_config.log")
 GSC_OUTPUT_FILE = env('GSC_OUTPUT_FILE', default="{}.site.yml")
 GSC_OUTPUT_LOCATION = env('GSC_OUTPUT_LOCATION', default="/var/www/brainsconfig")
-GSC_PARTITIONS = {"part1": {"dnets": ["dnet1"]},
-                  "part2": {"dnets": ["dnet2"]}}
+GSC_PARTITIONS = json.loads(env('GSC_PARTITIONS'))
 GSC_BLACKLIST_FILE = env('GSC_BLACKLIST_FILE', default='blacklist.txt')
 GSC_DEFAULT_CACHE_TIME = env('GSC_DEFAULT_CACHE_TIME', default=10)
 GSC_DEFAULT_NETWORK = env('GSC_DEFAULT_NETWORK', default='dnet1')
