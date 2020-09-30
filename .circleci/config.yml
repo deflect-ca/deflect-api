@@ -24,7 +24,7 @@ jobs:
       - python/save-cache
       - run:
           name: Setup SQLite on CI
-          command:
+          command: |
             cp core/.env.ci core/.env
             python manage.py migrate
       - run:
