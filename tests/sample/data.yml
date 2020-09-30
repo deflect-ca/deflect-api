@@ -1,0 +1,136 @@
+- model: api.website
+  pk: 1
+  fields:
+    url: example.com
+    status: -1.0
+    ip_address: 192.0.2.0
+    hidden_domain: 5s6kpkzhnn
+    banjax_auth_hash: null
+    admin_key: null
+    under_attack: false
+    awstats_password: 30d62a12-a338-43a9-9f45-311ae9b65c20
+    ats_purge_secret: ieYhzwCwBYKTCBIx
+    created_at: 2020-09-30 17:06:17.894733+00:00
+    updated_at: 2020-09-30 17:06:17.894777+00:00
+- model: api.website
+  pk: 2
+  fields:
+    url: example.net
+    status: -1.0
+    ip_address: 192.0.2.1
+    hidden_domain: bt7xvhft6j
+    banjax_auth_hash: null
+    admin_key: null
+    under_attack: false
+    awstats_password: 30d62a12-a338-43a9-9f45-311ae9b65c20
+    ats_purge_secret: CQBEoRtdGkCRUlQO
+    created_at: 2020-09-30 17:06:41.164249+00:00
+    updated_at: 2020-09-30 17:06:41.164277+00:00
+- model: api.website
+  pk: 3
+  fields:
+    url: example.org
+    status: -1.0
+    ip_address: 192.0.2.2
+    hidden_domain: upsubgq4o5
+    banjax_auth_hash: null
+    admin_key: null
+    under_attack: false
+    awstats_password: 30d62a12-a338-43a9-9f45-311ae9b65c20
+    ats_purge_secret: lufWHgjiPTmOjcbR
+    created_at: 2020-09-30 17:07:12.100549+00:00
+    updated_at: 2020-09-30 17:07:12.100589+00:00
+- model: api.website
+  pk: 4
+  fields:
+    url: example.edu
+    status: -1.0
+    ip_address: 192.0.2.3
+    hidden_domain: ylzjgax72v
+    banjax_auth_hash: null
+    admin_key: null
+    under_attack: false
+    awstats_password: 78862988-0e2d-49ce-85fe-d6f6a118a683
+    ats_purge_secret: ovlOmCmcWGRvogTV
+    created_at: 2020-09-30 17:09:53.220353+00:00
+    updated_at: 2020-09-30 17:09:53.220381+00:00
+- model: api.record
+  pk: 1
+  fields:
+    type: A
+    hostname: ftp
+    value: 203.0.113.0
+    priority: null
+    weight: null
+    website: 1
+    deflect: false
+    port: null
+    ttl: 3600
+- model: api.record
+  pk: 2
+  fields:
+    type: A
+    hostname: sftp
+    value: 203.0.113.1
+    priority: null
+    weight: null
+    website: 1
+    deflect: false
+    port: null
+    ttl: 3600
+- model: api.record
+  pk: 3
+  fields:
+    type: A
+    hostname: mail
+    value: 203.0.113.2
+    priority: null
+    weight: null
+    website: 1
+    deflect: false
+    port: null
+    ttl: 3600
+- model: api.record
+  pk: 4
+  fields:
+    type: A
+    hostname: blog
+    value: 203.0.113.3
+    priority: null
+    weight: null
+    website: 1
+    deflect: false
+    port: null
+    ttl: 3600
+- model: api.record
+  pk: 5
+  fields:
+    type: A
+    hostname: vpn
+    value: 203.0.113.4
+    priority: null
+    weight: null
+    website: 1
+    deflect: false
+    port: null
+    ttl: 3600
+- model: api.certificate
+  pk: 1
+  fields:
+    hostnames: '*.example.com, example.com'
+    fingerprint: d35849e9ecb2d2bce3af67d04700eff61c9b28a1
+    has_private: true
+    issuing_ca: DE:28:F4:A4:FF:E5:B9:2F:A3:C5:03:D1:A3:49:A7:F9:96:2A:82:12
+    date_created: 2020-09-08 14:59:02+00:00
+    date_expires: 2026-09-06 14:59:02+00:00
+    website: 1
+- model: api.certificate
+  pk: 2
+  fields:
+    hostnames: example.edu
+    fingerprint: d35849e9ecb2d2bce3af67d04700eff61c9b28a1
+    has_private: true
+    issuing_ca: DE:28:F4:A4:FF:E5:B9:2F:A3:C5:03:D1:A3:49:A7:F9:96:2A:82:12
+    date_created: 2020-09-10 19:19:42+00:00
+    date_expires: 2026-09-08 19:19:42+00:00
+    website: 4

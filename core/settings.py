@@ -16,7 +16,8 @@ import json
 import environ
 
 env = environ.Env(
-    ALLOWED_HOSTS=(list, [])
+    ALLOWED_HOSTS=(list, []),
+    USE_SQLITE=bool
 )
 
 # Use .env.ci instead of .env during CI test
@@ -87,7 +88,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-if 'USE_SQLITE' in os.environ:
+if 'USE_SQLITE' in os.environ or env('USE_SQLITE', default=False):
     # Use sqlite in CI test, defined in test.py
     DATABASES = {
         'default': {
