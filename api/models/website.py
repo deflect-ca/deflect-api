@@ -1,9 +1,15 @@
 import base64
+import hashlib
 import uuid
 import string
 import random
 
 from django.db import models
+
+
+def generate_banjax_auth_hash(password):
+    return base64.encodebytes(
+            hashlib.sha256(password.encode('utf8')).digest()).rstrip()
 
 
 def generate_hidden_domain(domain_len=10):
@@ -92,6 +98,13 @@ class Website(models.Model):
         for options in all_options:
             dic[options.name] = options.data.get('data')
         return dic
+
+    def set_banjax_auth_hash(self, password):
+        """
+        Store the hashed Banjax password
+        """
+        self.banjax_auth_hash = generate_banjax_auth_hash(password)
+        self.save()
 
     def __repr__(self):
         return '<Website #{} {}>'.format(self.id, self.url)

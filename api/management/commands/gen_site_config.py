@@ -442,7 +442,7 @@ class Command(BaseCommand):
             return False
 
         # XXX Skip sites which have not been approved in Dashadmin
-        if not site.get_option("approved"):
+        if not site.get_option("approved") and not settings.GSC_IGNORE_APPROVAL:
             return False
 
         return True
