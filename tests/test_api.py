@@ -1,6 +1,7 @@
 import sys
 
 from django.test import TestCase
+from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, force_authenticate
@@ -30,7 +31,7 @@ class APITestCase(TestCase):
 
     def test_edge_query(self):
         response = self.client.get('/api/edge/list', {
-            'dnet': 'test'
+            'dnet': settings.EDGEMANAGE_DNET
         })
 
         # Check that the response is 200 OK.
@@ -44,8 +45,8 @@ class APITestCase(TestCase):
 
     def test_edge_conf(self):
         response = self.client.post('/api/edge/config', {
-            'dnet': 'test',
-            'edge': 'deflect.ca',
+            'dnet': settings.EDGEMANAGE_DNET,
+            'edge': settings.EDGEMANAGE_TEST_EDGE,
             'mode': 'unavailable',
             'comment': 'test rotate',
             'comment_user': 'circleci'

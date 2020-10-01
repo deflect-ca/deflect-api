@@ -149,8 +149,11 @@ STATIC_URL = '/static/'
 
 # Custom
 APP_NAME = env('APP_NAME', default='deflect-core')
+
+# Edgemanage
 EDGEMANAGE_CONFIG = env('EDGEMANAGE_CONFIG')
 EDGEMANAGE_DNET = env('EDGEMANAGE_DNET')
+EDGEMANAGE_TEST_EDGE = env('EDGEMANAGE_TEST_EDGE', default='deflect.ca')
 
 LOGGING = {
     'version': 1,
