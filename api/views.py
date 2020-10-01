@@ -1,4 +1,5 @@
 import django
+import logging
 
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -26,8 +27,10 @@ def api_edge_query(request):
     try:
         return Response(edge_query(request.GET['dnet']))
     except KeyError as err:
-        return Response({"error": str(err)}, status=status.HTTP_404_NOT_FOUND)
+        logging.error(err)
+        return Response({"error": str(err)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as err:
+        logging.error(err)
         return Response({"error": str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -36,6 +39,7 @@ def api_dnet_query(request):
     try:
         return Response(dnet_query())
     except FileNotFoundError as err:
+        logging.error(err)
         return Response({"error": str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -53,6 +57,8 @@ def api_edge_conf(request):
             request.data['comment_user'])
         return Response(edge_conf_result, status=status.HTTP_201_CREATED)
     except KeyError as err:
-        return Response({"error": str(err)}, status=status.HTTP_404_NOT_FOUND)
+        logging.error(err)
+        return Response({"error": str(err)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as err:
+        logging.error(err)
         return Response({"error": str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
