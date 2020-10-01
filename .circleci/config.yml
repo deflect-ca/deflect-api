@@ -28,7 +28,7 @@ jobs:
             cp core/.env.ci core/.env
             python manage.py migrate
       - run:
-          command: python test.py
+          command: python manage.py test
           name: Test
 
 workflows:

@@ -17,12 +17,14 @@ import environ
 
 env = environ.Env(
     ALLOWED_HOSTS=(list, []),
-    USE_SQLITE=bool
+    USE_SQLITE=bool,
+    TESTING=bool
 )
 
 # Use .env.ci instead of .env during CI test
 ENV_PATH = os.environ['ENV_PATH'] if 'ENV_PATH' in os.environ else None
 environ.Env.read_env(env_file=ENV_PATH)
+TESTING = env('TESTING', default=False)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
