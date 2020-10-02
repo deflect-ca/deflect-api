@@ -134,3 +134,31 @@
     date_created: 2020-09-10 19:19:42+00:00
     date_expires: 2026-09-08 19:19:42+00:00
     website: 4
+- model: api.websiteoption
+  pk: 1
+  fields:
+    name: use_ssl
+    data:
+      data: false
+    website: 1
+- model: api.websiteoption
+  pk: 2
+  fields:
+    name: use_ssl
+    data:
+      data: true
+    website: 2
+- model: api.websiteoption
+  pk: 3
+  fields:
+    name: cache_time
+    data:
+      data: 10
+    website: 1
+- model: api.websiteoption
+  pk: 4
+  fields:
+    name: cache_time
+    data:
+      data: 20
+    website: 2

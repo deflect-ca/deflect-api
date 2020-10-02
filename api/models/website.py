@@ -86,7 +86,7 @@ class Website(models.Model):
         if option is None:
             return self.options.create(name=key, data=data)
         else:
-            return option.update(data=data)
+            return self.options.update(data=data)
 
     def set_bulk_options(self, obj):
         for key in obj:
