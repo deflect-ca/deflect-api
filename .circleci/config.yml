@@ -33,8 +33,13 @@ jobs:
             mkdir /tmp/part1
             mkdir /tmp/part2
       - run:
-          command: python manage.py test
-          name: Test
+          name: Test / Coverage Report
+          command: |
+            coverage run --source . --omit='venv/*,edgemanage3/*' manage.py test
+            coverage html
+      - store_artifacts:
+          path: htmlcov
+          destination: artifact-file
 
 workflows:
   main:
