@@ -28,6 +28,11 @@ jobs:
             cp core/.env.ci core/.env
             python manage.py migrate
       - run:
+          name: Setup gen_site_config output dir
+          command: |
+            mkdir /tmp/part1
+            mkdir /tmp/part2
+      - run:
           command: python manage.py test
           name: Test
 

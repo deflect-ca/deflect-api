@@ -64,3 +64,5 @@ class Command(BaseCommand):
 
         if deepdiff == {}:
             self.stdout.write(self.style.SUCCESS('file1 and file2 are identical'))
+        else:
+            self.stderr.write(self.style.ERROR('file and file2 are different'))

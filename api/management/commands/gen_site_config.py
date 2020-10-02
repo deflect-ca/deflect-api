@@ -83,6 +83,8 @@ class Command(BaseCommand):
         site_details = [site for site in Website.objects.all()
                         if self.should_include_site(site, blacklist_list)]
 
+        logging.info('site_details length = %d', len(site_details))
+
         dumb_subsites = self.find_subsites(site_details)
 
         datadict = {site.url: self.dict_for_site(site) for site in site_details}
@@ -436,13 +438,16 @@ class Command(BaseCommand):
         Decide if a site should be included in the clients.yml
         """
         if site.url in blacklist_list:
+            logging.info('EXCLUDE %s (blacklist)', site.url)
             return False
 
         if site.status < 3 and site.status != -1:
+            logging.info('EXCLUDE %s (status < 3 && != -1)', site.url)
             return False
 
         # XXX Skip sites which have not been approved in Dashadmin
         if not site.get_option("approved") and not settings.GSC_IGNORE_APPROVAL:
+            logging.info('EXCLUDE %s (!approved)', site.url)
             return False
 
         return True
@@ -481,6 +486,9 @@ class Command(BaseCommand):
         return dnet_to_partition
 
     def write_config_if_changed(self, new_config_dict, output_directory, debug):
+        self.stdout.write(self.style.SUCCESS(
+            'gen_site_config succeed / write_config_if_changed'))
+
         if not os.path.isdir(output_directory):
             if 'TESTING' in os.environ:
                 os.mkdir(output_directory)

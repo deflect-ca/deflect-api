@@ -1,0 +1,109 @@
+remap:
+  example.com:
+    ats_purge_secret: ieYhzwCwBYKTCBIx
+    awstats_password: 30d62a12-a338-43a9-9f45-311ae9b65c20
+    banjax_captcha: false
+    banjax_password: ''
+    banjax_path: ''
+    banjax_sha_inv: false
+    cache_time: 10
+    disable_logging: false
+    dns_records:
+      blog:
+      - type: A
+        value: 203.0.113.3
+      ftp:
+      - type: A
+        value: 203.0.113.0
+      mail:
+      - type: A
+        value: 203.0.113.2
+      sftp:
+      - type: A
+        value: 203.0.113.1
+      vpn:
+      - type: A
+        value: 203.0.113.4
+    email: null
+    hidden: 5s6kpkzhnn
+    http_type: http
+    https: false
+    letsencrypt: false
+    network: dnet1
+    ns_monitoring_disabled: false
+    ns_on_deflect: false
+    origin: 192.0.2.0
+    origin_certificates: true
+    url: example.com
+    user_banjax_sha_inv: false
+    validate_tls: false
+  example.edu:
+    ats_purge_secret: ovlOmCmcWGRvogTV
+    awstats_password: 78862988-0e2d-49ce-85fe-d6f6a118a683
+    banjax_captcha: false
+    banjax_password: ''
+    banjax_path: ''
+    banjax_sha_inv: false
+    cache_time: 10
+    disable_logging: false
+    dns_records: {}
+    email: null
+    hidden: ylzjgax72v
+    http_type: http
+    https: false
+    letsencrypt: false
+    network: dnet1
+    ns_monitoring_disabled: false
+    ns_on_deflect: false
+    origin: 192.0.2.3
+    origin_certificates: true
+    url: example.edu
+    user_banjax_sha_inv: false
+    validate_tls: false
+  example.net:
+    ats_purge_secret: CQBEoRtdGkCRUlQO
+    awstats_password: 30d62a12-a338-43a9-9f45-311ae9b65c20
+    banjax_captcha: false
+    banjax_password: ''
+    banjax_path: ''
+    banjax_sha_inv: false
+    cache_time: 20
+    disable_logging: false
+    dns_records: {}
+    email: null
+    hidden: bt7xvhft6j
+    http_type: https
+    https: true
+    letsencrypt: false
+    network: dnet1
+    ns_monitoring_disabled: false
+    ns_on_deflect: false
+    origin: 192.0.2.1
+    origin_certificates: false
+    url: example.net
+    user_banjax_sha_inv: false
+    validate_tls: false
+  example.org:
+    ats_purge_secret: lufWHgjiPTmOjcbR
+    awstats_password: 30d62a12-a338-43a9-9f45-311ae9b65c20
+    banjax_captcha: false
+    banjax_password: ''
+    banjax_path: ''
+    banjax_sha_inv: false
+    cache_time: 10
+    disable_logging: false
+    dns_records: {}
+    email: null
+    hidden: upsubgq4o5
+    http_type: http
+    https: false
+    letsencrypt: false
+    network: dnet1
+    ns_monitoring_disabled: false
+    ns_on_deflect: false
+    origin: 192.0.2.2
+    origin_certificates: false
+    url: example.org
+    user_banjax_sha_inv: false
+    validate_tls: false
+timestamp: 1601624086633
