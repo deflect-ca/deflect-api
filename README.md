@@ -24,14 +24,13 @@ pip install -r requirements.txt
 
 # Edit .env to config database
 cp core/.env.example core/.env
-vim core/.env
 
 # Create super user for django
 python manage.py migrate
 python manage.py createsuperuser --email admin@example.com --username admin
 ```
 
-## Post-install
+## Install (edgemanage)
 
 After executing `python setup.py install` for edgemanage, there will be 3 binary installed
 
@@ -50,6 +49,41 @@ Execute commands to ensure edgemanage is installed correctly
 - `edge_manage --dnet dev --config dev/edgemanage/edgemanage.yaml -v`
 - `edge_conf --dnet dev --config dev/edgemanage/edgemanage.yaml --mode unavailable --comment "out" {edge_hostname}`
 - `edge_query --dnet dev --config dev/edgemanage/edgemanage.yaml -v`
+
+## django-admin commands
+
+### gen_site_config
+
+Generate `site.yml` file according to `Website`, `WebsiteOption` and `Record` model
+
+    python manage.py gen_site_config --output <path> --blacklist <list.txt> --debug
+
+Configuration should be set in `.env` before running this command:
+
+    GSC_LOG_FILE=/var/tmp/gen_site_config.log
+    GSC_OUTPUT_LOCATION=/var/www/brainsconfig
+    GSC_PARTITIONS={"part1": {"dnets": ["dnet1"]}, "part2": {"dnets": ["dnet2"]}}
+    GSC_DEFAULT_NETWORK=dnet1
+    GSC_IGNORE_APPROVAL=True
+
+`GSC_IGNORE_APPROVAL` ignores `approval` in `website_option` during `gen_site_config`, this should be set to `True` in most cases.
+
+For dev purposes, `GSC_LOG_FILE` and `GSC_OUTPUT_LOCATION` could make use of the `dev/gen_sit_config` directory.
+
+### deep_diff
+
+This command executes `deepdiff` on two givne YAML file, and generates a difference in YAML format.
+
+    python manage.py deep_diff --file1 <path> --file2 <path> --output <path>
+
+`tests/test_gen_site_config.py` make use of this command to ensure generate `site.yml` is identical to `tests/sample/site.yml`.
+
+## Tests
+
+Invoke django test. Test includes API, Model and gen_site_config test, this will read your local `.env` file. `.env.ci` is only used on CircleCI.
+
+    python manage.py test
+
 
 ## Django Admin
 
@@ -136,7 +170,3 @@ List all available dnet
     }
 }
 ```
-
-## Tests
-
-    python test.py
