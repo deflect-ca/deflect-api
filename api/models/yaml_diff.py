@@ -1,13 +1,32 @@
+import six
 import yaml
 
 from django.db import models
+from django.core.exceptions import ValidationError
 from yamlfield.fields import YAMLField
 from deepdiff import DeepDiff
 
 
-class BadYaml(Exception):
+class BadYaml(ValidationError):
     pass
 
+class CustomYAMLField(YAMLField):
+    def from_db_value(self, value, expression, connection, context=None):
+        return self.to_python(value)
+
+    def to_python(self, value):
+        """
+        Convert our YAML string to a Python object
+        after we load it from the DB.
+        """
+        if value == "":
+            return None
+        try:
+            if isinstance(value, six.string_types):
+                return yaml.load(value, Loader=yaml.FullLoader)
+        except ValueError:
+            raise BadYaml("Fail to load invalid YAML in diff field")
+        return value
 
 class YamlDiff(models.Model):
     """
@@ -24,7 +43,7 @@ class YamlDiff(models.Model):
     prev_epoch_time = models.BigIntegerField()
 
     # diff = db.Column(YAMLEncodedDict)
-    diff = YAMLField()
+    diff = CustomYAMLField()
 
     # partition = db.Column(db.String(150), default="")
     partition = models.CharField(max_length=150, default='', null=True, blank=True)
