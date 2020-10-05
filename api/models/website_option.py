@@ -26,3 +26,6 @@ class WebsiteOption(Model):
 
     def __repr__(self):
         return '<WebsiteOption {}={}>'.format(self.name, self.data)
+
+    def __str__(self):
+        return 'WebsiteOption {}={}'.format(self.name, self.data)

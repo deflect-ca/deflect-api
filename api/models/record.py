@@ -40,5 +40,9 @@ class Record(models.Model):
     ttl = models.IntegerField(default=3600, null=True, blank=True)
 
     def __repr__(self):
-        return '<Record id={} type={}, hostname={}>'.format(
+        return '<Record id={}, type={}, hostname={}>'.format(
+            self.id, self.type, self.hostname)
+
+    def __str__(self):
+        return 'Record id={}, type={}, hostname={}'.format(
             self.id, self.type, self.hostname)

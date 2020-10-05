@@ -33,4 +33,7 @@ class Certificate(models.Model):
         on_delete=models.CASCADE, related_name='certificates')
 
     def __repr__(self):
-        return '<Certificate hostnames={}>'.format(self.hostnames.split(", "))
+        return '<Certificate #{} {}>'.format(self.id, self.hostnames.split(", "))
+
+    def __str__(self):
+        return 'Certificate #{} {}'.format(self.id, self.hostnames.split(", "))
