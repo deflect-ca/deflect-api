@@ -186,6 +186,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'api.auth.TokenAuthenticationChild',
+        'rest_framework.authentication.SessionAuthentication',  # API viewer
     ]
 }
 
