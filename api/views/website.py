@@ -1,7 +1,10 @@
-from api.models import Website
+from django.http import Http404
+
+from rest_framework import mixins, generics
+from rest_framework.response import Response
+
+from api.models import Website, WebsiteOption
 from api.serializers import WebsiteSerializer
-from rest_framework import mixins
-from rest_framework import generics
 
 
 class WebsiteList(mixins.ListModelMixin,
@@ -21,6 +24,19 @@ class WebsiteDetail(mixins.RetrieveModelMixin,
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
+
+class WebsiteListOptions(generics.GenericAPIView):
+    """ /api/website/<int:pk>/options """
+    queryset = Website.objects.all()
+
+    def get_object(self, pk):
+        try:
+            return Website.objects.get(pk=pk)
+        except Website.DoesNotExist:
+            raise Http404
+
+    def get(self, request, *args, **kwargs):
+        return Response(self.get_object(kwargs['pk']).list_option())
 
 class WebsiteCreate(mixins.CreateModelMixin,
                     generics.GenericAPIView):
