@@ -25,7 +25,7 @@ class WebsiteOption(Model):
         on_delete=models.CASCADE, related_name='options')
 
     def __repr__(self):
-        return '<WebsiteOption {}={}>'.format(self.name, self.data)
+        return '<WebsiteOption {}={}>'.format(self.name, self.data['data'])
 
     def __str__(self):
-        return 'WebsiteOption {}={}'.format(self.name, self.data)
+        return 'WebsiteOption {}={}'.format(self.name, self.data['data'])
