@@ -11,8 +11,11 @@ urlpatterns = [
     path('edge/config', edgemanage.api_edge_conf, name='api_edge_conf'),
 
     # django-rest-framework
-    path('website/', website.WebsiteList.as_view()),
-    path('website/<int:pk>/', website.WebsiteDetail.as_view()),
+    path('website/list', website.WebsiteList.as_view()),
+    path('website/<int:pk>', website.WebsiteDetail.as_view()),
+    path('website/create', website.WebsiteCreate.as_view()),
+    path('website/modify/<int:pk>', website.WebsiteModify.as_view()),
+    path('website/delete/<int:pk>', website.WebsiteDelete.as_view())
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
