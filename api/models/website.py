@@ -27,6 +27,10 @@ def generate_ats_purge_secret():
         string.ascii_lowercase + string.ascii_uppercase) for _ in range(16))
 
 
+def generate_awstats_password():
+    return uuid.uuid4()
+
+
 class Website(models.Model):
     """
     Model of website
@@ -58,7 +62,7 @@ class Website(models.Model):
     under_attack = models.BooleanField(default=False)
 
     # awstats_password = db.Column(db.String(40), nullable=False, default=lambda: uuid.uuid4())
-    awstats_password = models.CharField(max_length=40, null=False, default=uuid.uuid4())
+    awstats_password = models.CharField(max_length=40, null=False, default=generate_awstats_password)
 
     # ats_purge_secret = \
     #     db.Column(db.String(64), default=lambda: ''.join(
