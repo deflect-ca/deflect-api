@@ -17,7 +17,7 @@ class WebsiteOption(Model):
 
     # data = db.Column(PickledDict, nullable=False)
     # An attempt to use JSON instead of Pickle
-    data = models.JSONField()
+    data = models.JSONField(null=True, blank=True)
 
     # one-to-many with website
     # access website.options to get all options
@@ -25,7 +25,7 @@ class WebsiteOption(Model):
         on_delete=models.CASCADE, related_name='options')
 
     def __repr__(self):
-        return '<WebsiteOption {}={}>'.format(self.name, self.data['data'])
+        return '<WebsiteOption {}={}>'.format(self.name, self.data)
 
     def __str__(self):
-        return 'WebsiteOption {}={}'.format(self.name, self.data['data'])
+        return 'WebsiteOption {}={}'.format(self.name, self.data)

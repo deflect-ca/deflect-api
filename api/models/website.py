@@ -77,16 +77,15 @@ class Website(models.Model):
             return fallback
         elif option is None and fallback is None:
             return None
-        return option.data.get('data')  # break json wrap
+        return option.data
 
     def set_option(self, key, value):
         option = self.options.filter(name=key).first()
-        data = {'data': value}  # wrap with json
 
         if option is None:
-            return self.options.create(name=key, data=data)
+            return self.options.create(name=key, data=value)
         else:
-            return self.options.update(data=data)
+            return self.options.update(data=value)
 
     def set_bulk_options(self, obj):
         for key in obj:
@@ -96,7 +95,7 @@ class Website(models.Model):
         all_options = self.options.all()
         dic = {}
         for options in all_options:
-            dic[options.name] = options.data.get('data')
+            dic[options.name] = options.data
         return dic
 
     def set_banjax_auth_hash(self, password):

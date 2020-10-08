@@ -30,7 +30,7 @@ class Command(BaseCommand):
                 bulk_arr.append(WebsiteOption(
                     website_id=w_option['website_id'],
                     name=w_option['name'],
-                    data=w_option['data']
+                    data=w_option['data']['data']
                 ))
 
             WebsiteOption.objects.bulk_create(bulk_arr)

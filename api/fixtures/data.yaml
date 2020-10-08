@@ -138,27 +138,23 @@
   pk: 1
   fields:
     name: use_ssl
-    data:
-      data: false
+    data: false
     website: 1
 - model: api.websiteoption
   pk: 2
   fields:
     name: use_ssl
-    data:
-      data: true
+    data: true
     website: 2
 - model: api.websiteoption
   pk: 3
   fields:
     name: cache_time
-    data:
-      data: 10
+    data: 10
     website: 1
 - model: api.websiteoption
   pk: 4
   fields:
     name: cache_time
-    data:
-      data: 20
+    data: 20
     website: 2
