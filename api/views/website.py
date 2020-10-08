@@ -4,14 +4,14 @@ from rest_framework import mixins, generics
 from rest_framework.response import Response
 
 from api.models import Website, WebsiteOption
-from api.serializers import WebsiteSerializer
+from api.serializers import WebsiteSerializer, WebsiteListSerializer
 
 
 class WebsiteList(mixins.ListModelMixin,
                   generics.GenericAPIView):
     """ /api/website/list """
     queryset = Website.objects.all()
-    serializer_class = WebsiteSerializer
+    serializer_class = WebsiteListSerializer  # do not show options
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)

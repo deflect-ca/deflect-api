@@ -5,4 +5,4 @@ from api.models import WebsiteOption
 class WebsiteOptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = WebsiteOption
-        fields = ['id', 'name', 'data']
+        fields = ['name', 'data']
