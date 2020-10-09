@@ -1,5 +1,4 @@
 from django.db import models
-from django_mysql.models import JSONField
 from django_mysql.models import Model as DjangoMySQLModel
 from marshmallow import fields, Schema, validate
 
@@ -19,7 +18,7 @@ class WebsiteOption(DjangoMySQLModel):
 
     # data = db.Column(PickledDict, nullable=False)
     # An attempt to use JSON instead of Pickle
-    data = JSONField(null=True, blank=True)
+    data = models.JSONField(null=True, blank=True)
 
     # one-to-many with website
     # access website.options to get all options
