@@ -5,6 +5,7 @@ import string
 import random
 
 from django.db import models
+from .website_option import WebsiteOption
 
 
 def generate_banjax_auth_hash(password):
@@ -78,27 +79,26 @@ class Website(models.Model):
 
     def get_option(self, key, fallback=None):
         option = self.options.filter(name=key).first()
-        if option is None and fallback is not None:
-            return fallback
-        elif option is None and fallback is None:
-            return None
-        return option.data
+        return option.data if option else fallback
 
     def set_option(self, key, value):
         option = self.options.filter(name=key).first()
 
+        # validate before insert / update
+        valid_option = WebsiteOption.serialize(key, value)
+
+        # create
         if option is None:
-            return self.options.create(name=key, data=value)
-        else:
-            return self.options.update(data=value)
+            return self.options.create(name=key, data=valid_option[key])
+
+        return self.options.update(data=valid_option[key])
 
     def set_bulk_options(self, obj):
         for key in obj:
             self.set_option(key, obj[key])
 
     def list_option(self):
-        all_options = self.options.all()
-        dic = {}
+        all_options, dic = self.options.all(), {}
         for options in all_options:
             dic[options.name] = options.data
         return dic
