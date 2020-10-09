@@ -62,7 +62,8 @@ class Website(models.Model):
     under_attack = models.BooleanField(default=False)
 
     # awstats_password = db.Column(db.String(40), nullable=False, default=lambda: uuid.uuid4())
-    awstats_password = models.CharField(max_length=40, null=False, default=generate_awstats_password)
+    awstats_password = \
+        models.CharField(max_length=40, null=False, default=generate_awstats_password)
 
     # ats_purge_secret = \
     #     db.Column(db.String(64), default=lambda: ''.join(

@@ -12,9 +12,10 @@ urlpatterns = [
 
     # django-rest-framework
     path('website/list', website.WebsiteList.as_view()),
-    path('website/<int:pk>', website.WebsiteDetail.as_view()),
-    path('website/<int:pk>/options', website.WebsiteListOptions.as_view(), name='website-options'),
     path('website/create', website.WebsiteCreate.as_view()),
+    path('website/<int:pk>', website.WebsiteDetail.as_view()),
+    path('website/<int:pk>/options',
+        website.WebsiteListOptions.as_view(), name='website-options'),
     path('website/<int:pk>/modify', website.WebsiteModify.as_view()),
     path('website/<int:pk>/delete', website.WebsiteDelete.as_view())
 ]

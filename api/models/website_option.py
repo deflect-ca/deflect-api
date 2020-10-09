@@ -17,7 +17,7 @@ class WebsiteOption(Model):
 
     # data = db.Column(PickledDict, nullable=False)
     # An attempt to use JSON instead of Pickle
-    data = models.JSONField(null=True, blank=True)
+    data = JSONField(null=True, blank=True)
 
     # one-to-many with website
     # access website.options to get all options
