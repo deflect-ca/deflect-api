@@ -23,6 +23,7 @@ Jinja2==3.0.0a1
 lazy-object-proxy==1.4.3
 Markdown==3.2.2
 MarkupSafe==2.0.0a1
+marshmallow==3.8.0
 mccabe==0.6.1
 mysqlclient==2.0.1
 ordered-set==4.0.2
