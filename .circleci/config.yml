@@ -9,8 +9,9 @@ jobs:
     executor: python/default
     steps:
       - checkout
-      #- python/load-cache
+      - python/load-cache
       - python/install-deps
+      - python/save-cache
       - run: git submodule update --init
       - run:
           name: Install edgemanage
@@ -21,7 +22,6 @@ jobs:
       - run:
           name: Test edge_query
           command: edge_query --config tests/edgemanage/edgemanage.yaml --dnet test -v
-      #- python/save-cache
       - run:
           name: Setup SQLite on CI
           command: |
