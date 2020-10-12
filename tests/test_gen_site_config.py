@@ -2,6 +2,7 @@ from io import StringIO
 from django.conf import settings
 from django.test import TestCase
 from django.core.management import call_command
+from api.models import YamlDiff
 
 
 class GenSiteConfigTestCase(TestCase):
@@ -10,8 +11,12 @@ class GenSiteConfigTestCase(TestCase):
     def test_01_gen_site_config(self):
         out = StringIO()
         call_command('gen_site_config',  # GSC_OUTPUT_LOCATION=/tmp in .env.ci
-            stdout=out)
+            stdout=out, test=True)  # Enable --test to always write YAML
         self.assertIn('gen_site_config succeed', out.getvalue())
+
+        # Test if YamlDiff was recorded
+        ydiff = YamlDiff.objects.first()
+        self.assertNotEqual(ydiff, None)
 
     def test_02_deep_diff(self):
         out, err = StringIO(), StringIO()

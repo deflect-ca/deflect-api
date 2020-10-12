@@ -44,6 +44,12 @@ class Command(BaseCommand):
             action='store_true',
             help='Debug mode'
         )
+        parser.add_argument(
+            '-t', '--test',
+            default=False,
+            action='store_true',
+            help='Unit test mode, always save YAML Diff and output site.yml'
+        )
 
     def handle(self, *args, **options):
         """
@@ -54,6 +60,7 @@ class Command(BaseCommand):
         blacklist_file = options['blacklist']
         output_location = options['output']
         debug = options['debug']
+        self.test = options['test']
 
         if not os.path.isabs(blacklist_file):
             blacklist_path = os.path.join(output_location, blacklist_file)
@@ -529,7 +536,10 @@ class Command(BaseCommand):
             logging.info("First run in this output directory.")
         elif raw_diff == {}:
             logging.info("No site changes detected.")
-            return
+            if not self.test:
+                return
+            else:
+                logging.info("Test mode enabled (--test), continue")
         else:
             logging.info("Site changes detected.")
 

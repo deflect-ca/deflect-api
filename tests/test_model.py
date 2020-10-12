@@ -4,11 +4,14 @@ from marshmallow import ValidationError
 
 
 class ModelTestCase(TestCase):
+    # api/fixtures
     fixtures = ['data.yaml']
 
     def setUp(self):
         self.website_1 = Website.objects.get(pk=1)
         self.website_2 = Website.objects.get(pk=2)
+        self.website_3 = Website.objects.get(pk=3)
+        self.website_4 = Website.objects.get(pk=4)
 
     def test_website(self):
         self.assertEqual(self.website_1.url, 'example.com')
@@ -42,3 +45,14 @@ class ModelTestCase(TestCase):
         # not correct type
         with self.assertRaises(ValidationError):
             self.website_1.set_option('approved', 87)  # suppose to be boolean
+
+    def test_certificate(self):
+        cert_1 = self.website_1.certificates.first()
+        cert_4 = self.website_4.certificates.first()
+        self.assertEqual(cert_1.hostnames, '*.example.com, example.com')
+        self.assertEqual(cert_4.hostnames, 'example.edu')
+
+    def test_record(self):
+        record_1 = self.website_1.records.get(pk=1)
+        self.assertEqual(record_1.type, 'A')
+        self.assertEqual(record_1.hostname, 'ftp')
