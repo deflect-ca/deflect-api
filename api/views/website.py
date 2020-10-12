@@ -4,7 +4,7 @@ from rest_framework import mixins, generics
 from rest_framework.response import Response
 
 from api.models import Website, WebsiteOption
-from api.serializers import WebsiteSerializer, WebsiteListSerializer
+from api.serializers import WebsiteSerializer, WebsiteListSerializer, WebsiteOptionSerializer
 
 
 class WebsiteList(mixins.ListModelMixin,
@@ -25,18 +25,30 @@ class WebsiteDetail(mixins.RetrieveModelMixin,
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
 
-class WebsiteListOptions(generics.GenericAPIView):
+class WebsiteListOptions(mixins.ListModelMixin,
+                         mixins.CreateModelMixin,
+                         generics.GenericAPIView):
     """ /api/website/<int:pk>/options """
-    queryset = Website.objects.all()
+    serializer_class = WebsiteOptionSerializer
 
-    def get_object(self, pk):
+    def get_queryset(self):
         try:
-            return Website.objects.get(pk=pk)
+            website = Website.objects.get(
+                pk=self.kwargs['pk'])
         except Website.DoesNotExist:
             raise Http404
+        return website.options.all()
 
     def get(self, request, *args, **kwargs):
-        return Response(self.get_object(kwargs['pk']).list_option())
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+class WebsiteOptionsDetails(generics.RetrieveUpdateDestroyAPIView):
+    """ /api/website/<int:website_pk>/options/<int:pk> """
+    serializer_class = WebsiteOptionSerializer
+    queryset = WebsiteOption.objects.all()
 
 class WebsiteCreate(mixins.CreateModelMixin,
                     generics.GenericAPIView):

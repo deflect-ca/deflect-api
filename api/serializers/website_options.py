@@ -3,6 +3,8 @@ from api.models import WebsiteOption
 
 
 class WebsiteOptionSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = WebsiteOption
-        fields = ['name', 'data']
+        fields = ['name', 'data', 'id', 'website_id']
+        read_only = ['id', 'website_id']
