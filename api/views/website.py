@@ -26,7 +26,6 @@ class WebsiteDetail(mixins.RetrieveModelMixin,
         return self.retrieve(request, *args, **kwargs)
 
 class WebsiteListOptions(mixins.ListModelMixin,
-                         mixins.CreateModelMixin,
                          generics.GenericAPIView):
     """ /api/website/<int:pk>/options """
     serializer_class = WebsiteOptionSerializer
@@ -41,14 +40,6 @@ class WebsiteListOptions(mixins.ListModelMixin,
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-
-class WebsiteOptionsDetails(generics.RetrieveUpdateDestroyAPIView):
-    """ /api/website/<int:website_pk>/options/<int:pk> """
-    serializer_class = WebsiteOptionSerializer
-    queryset = WebsiteOption.objects.all()
 
 class WebsiteCreate(mixins.CreateModelMixin,
                     generics.GenericAPIView):

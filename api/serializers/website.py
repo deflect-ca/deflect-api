@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import Website
+from api.models import Website, WebsiteOption
 from .website_options import WebsiteOptionSerializer
 
 
@@ -15,6 +15,8 @@ class WebsiteListSerializer(serializers.ModelSerializer):
 
 class WebsiteSerializer(serializers.ModelSerializer):
     options = WebsiteOptionSerializer(many=True)
+    hidden_domain = serializers.CharField(max_length=32, required=False)
+    awstats_password = serializers.CharField(max_length=40, required=False)
 
     class Meta:
         model = Website
@@ -23,3 +25,11 @@ class WebsiteSerializer(serializers.ModelSerializer):
                   'admin_key', 'under_attack', 'awstats_password',
                   'ats_purge_secret', 'options']
         read_only = ['id', 'url']
+
+    # Writable nested serializers
+    def create(self, validated_data):
+        options = validated_data.pop('options')
+        website = Website.objects.create(**validated_data)
+        for option in options:
+            WebsiteOption.objects.create(website=website, **option)
+        return website

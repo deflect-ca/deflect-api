@@ -6,5 +6,5 @@ class WebsiteOptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WebsiteOption
-        fields = ['name', 'data', 'id', 'website_id']
+        fields = ['name', 'data', 'id']
         read_only = ['id', 'website_id']
