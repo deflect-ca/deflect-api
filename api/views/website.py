@@ -17,6 +17,7 @@ class WebsiteList(mixins.ListModelMixin,
         return self.list(request, *args, **kwargs)
 
 class WebsiteDetail(mixins.RetrieveModelMixin,
+                    mixins.UpdateModelMixin,
                     generics.GenericAPIView):
     """ /api/website/<int:pk> """
     queryset = Website.objects.all()
@@ -24,6 +25,10 @@ class WebsiteDetail(mixins.RetrieveModelMixin,
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        self.serializer_class = WebsiteListSerializer
+        return self.update(request, *args, **kwargs)
 
 class WebsiteListOptions(mixins.ListModelMixin,
                          generics.GenericAPIView):

@@ -11,7 +11,7 @@ class WebsiteListSerializer(serializers.ModelSerializer):
                   'hidden_domain', 'banjax_auth_hash',
                   'admin_key', 'under_attack', 'awstats_password',
                   'ats_purge_secret']
-        read_only = ['id', 'url']
+        read_only_fields = ['id', 'url']
 
 class WebsiteSerializer(serializers.ModelSerializer):
     options = WebsiteOptionSerializer(many=True)
@@ -24,7 +24,7 @@ class WebsiteSerializer(serializers.ModelSerializer):
                   'hidden_domain', 'banjax_auth_hash',
                   'admin_key', 'under_attack', 'awstats_password',
                   'ats_purge_secret', 'options']
-        read_only = ['id', 'url']
+        read_only_fields = ['id', 'url']
 
     # Writable nested serializers
     def create(self, validated_data):
