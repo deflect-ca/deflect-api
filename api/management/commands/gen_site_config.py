@@ -180,7 +180,8 @@ class Command(BaseCommand):
                 del datadict[site_url]["dns_records"]
         return datadict
 
-    def child_sites_get_parent_network(self, datadict, dumb_subsites):
+    @staticmethod
+    def child_sites_get_parent_network(datadict, dumb_subsites):
         for site_url in datadict.keys():
             maybe_parent_site = dumb_subsites.get(site_url)
             if maybe_parent_site:
@@ -188,8 +189,9 @@ class Command(BaseCommand):
                 datadict[site_url]["network"] = datadict[parent_url]["network"]
         return datadict
 
-    def remove_orphans(self, datadict, dumb_subsites, debug):
-        for site_url in datadict.keys():
+    @staticmethod
+    def remove_orphans(datadict, dumb_subsites, debug):
+        for site_url in list(datadict):
             parent_site_get = dumb_subsites.get(site_url)
 
             # Check if this is a subsite of another site `parent_site_get`
