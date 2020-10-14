@@ -16,6 +16,8 @@ urlpatterns = [
     path('website/<int:pk>', website.WebsiteDetail.as_view()),
     path('website/<int:pk>/options',
         website.WebsiteListOptions.as_view(), name='website-options'),
+    path('website/<int:pk>/options/<str:name>',
+        website.WebsiteOptionsDetail.as_view(), name='website-options-detail'),
     path('website/<int:pk>/modify', website.WebsiteModify.as_view()),
     path('website/<int:pk>/delete', website.WebsiteDelete.as_view())
 ]

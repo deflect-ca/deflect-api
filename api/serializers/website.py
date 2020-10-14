@@ -43,6 +43,8 @@ class WebsiteSerializer(serializers.ModelSerializer):
             except marshmallow.ValidationError as err:
                 # invoke transaction rollback
                 raise serializers.ValidationError(str(err))
+            except KeyError as err:
+                raise serializers.ValidationError("KeyError", str(err))
 
         return website
 
@@ -62,6 +64,8 @@ class WebsiteSerializer(serializers.ModelSerializer):
                 updated_instance.set_option(option['name'], option['data'])
             except marshmallow.ValidationError as err:
                 # invoke transaction rollback
-                raise serializers.ValidationError(str(err))
+                raise serializers.ValidationError("Option schema error: %s" % str(err))
+            except KeyError as err:
+                raise serializers.ValidationError("KeyError: %s" % str(err))
 
         return instance

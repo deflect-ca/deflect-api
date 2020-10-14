@@ -17,7 +17,6 @@ class WebsiteList(mixins.ListModelMixin,
         return self.list(request, *args, **kwargs)
 
 class WebsiteDetail(mixins.RetrieveModelMixin,
-                    mixins.UpdateModelMixin,
                     generics.GenericAPIView):
     """ /api/website/<int:pk> """
     queryset = Website.objects.all()
@@ -25,25 +24,6 @@ class WebsiteDetail(mixins.RetrieveModelMixin,
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-class WebsiteListOptions(mixins.ListModelMixin,
-                         generics.GenericAPIView):
-    """ /api/website/<int:pk>/options """
-    serializer_class = WebsiteOptionSerializer
-
-    def get_queryset(self):
-        try:
-            website = Website.objects.get(
-                pk=self.kwargs['pk'])
-        except Website.DoesNotExist:
-            raise Http404
-        return website.options.all()
-
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
 class WebsiteCreate(mixins.CreateModelMixin,
                     generics.GenericAPIView):
@@ -68,6 +48,38 @@ class WebsiteDelete(mixins.DestroyModelMixin,
     """ /api/website/delete/<int:pk> """
     queryset = Website.objects.all()
     serializer_class = WebsiteSerializer
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+class WebsiteListOptions(mixins.ListModelMixin,
+                         generics.GenericAPIView):
+    """ /api/website/<int:pk>/options """
+    serializer_class = WebsiteOptionSerializer
+
+    def get_queryset(self):
+        try:
+            website = Website.objects.get(
+                pk=self.kwargs['pk'])
+        except Website.DoesNotExist:
+            raise Http404
+        return website.options.all()
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+class WebsiteOptionsDetail(mixins.RetrieveModelMixin,
+                           mixins.DestroyModelMixin,
+                           generics.GenericAPIView):
+    """ /api/website/<int:pk>/options/<str:name> """
+    serializer_class = WebsiteOptionSerializer
+    lookup_field = 'name'
+
+    def get_queryset(self):
+        return WebsiteOption.objects.filter(website_id=self.kwargs['pk'])
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
