@@ -17,7 +17,8 @@ def generate_hidden_domain(domain_len=10):
     """
     Generate the random hidden domain for a website
     """
-    return base64.b32encode(uuid.uuid4().bytes)[:domain_len].lower()
+    return base64.b32encode(
+        uuid.uuid4().bytes).decode()[:domain_len].lower()
 
 
 def generate_ats_purge_secret():
