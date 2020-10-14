@@ -27,7 +27,6 @@ class WebsiteDetail(mixins.RetrieveModelMixin,
         return self.retrieve(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
-        self.serializer_class = WebsiteListSerializer
         return self.update(request, *args, **kwargs)
 
 class WebsiteListOptions(mixins.ListModelMixin,

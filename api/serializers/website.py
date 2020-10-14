@@ -1,4 +1,3 @@
-import json
 import logging
 import marshmallow
 
@@ -42,3 +41,18 @@ class WebsiteSerializer(serializers.ModelSerializer):
                 website.delete()
                 raise serializers.ValidationError(str(err))
         return website
+
+    # Updatable nested serializers
+    def update(self, instance, validated_data):
+        # pop options
+        options = validated_data.pop('options')
+        # call parent update function
+        updated_instance = super(WebsiteSerializer, self).update(
+            instance, validated_data)
+        for option in options:
+            try:
+                # validate and create or update
+                updated_instance.set_option(option['name'], option['data'])
+            except marshmallow.ValidationError as err:
+                raise serializers.ValidationError(str(err))
+        return instance
