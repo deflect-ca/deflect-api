@@ -1,2 +1,3 @@
-from .website import WebsiteSerializer, WebsiteListSerializer
+from .website import (WebsiteSerializer, WebsiteDetailSerializer,
+                      WebsiteCreateSerializer, WebsiteUpdateSerializer)
 from .website_options import WebsiteOptionSerializer

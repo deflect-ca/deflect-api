@@ -7,7 +7,11 @@ from api.models import Website, WebsiteOption
 from .website_options import WebsiteOptionSerializer
 
 
-class WebsiteListSerializer(serializers.ModelSerializer):
+class WebsiteSerializer(serializers.ModelSerializer):
+    """
+    Most simple serializer with all fields
+    Used in /list, /delete
+    """
     class Meta:
         model = Website
         # without options in list
@@ -15,25 +19,50 @@ class WebsiteListSerializer(serializers.ModelSerializer):
                   'hidden_domain', 'banjax_auth_hash',
                   'admin_key', 'under_attack', 'awstats_password',
                   'ats_purge_secret']
-        read_only_fields = ['id']
+        read_only_fields = ['id', 'url']
 
-class WebsiteSerializer(serializers.ModelSerializer):
-    options = WebsiteOptionSerializer(many=True)
-    hidden_domain = serializers.CharField(max_length=32, required=False)
-    awstats_password = serializers.CharField(max_length=40, required=False)
-
+class WebsiteDetailSerializer(serializers.ModelSerializer):
+    """
+    Most simple serializer + options
+    Used in /<int:pk>
+    """
     class Meta:
         model = Website
+        # without options in list
         fields = ['id', 'url', 'status', 'ip_address',
                   'hidden_domain', 'banjax_auth_hash',
                   'admin_key', 'under_attack', 'awstats_password',
                   'ats_purge_secret', 'options']
+        read_only_fields = ['id', 'url']
+
+    # nested relations
+    options = WebsiteOptionSerializer(many=True)
+
+class WebsiteCreateSerializer(serializers.ModelSerializer):
+    """
+    Create serializer with necessary fields only
+    Used in /create
+    """
+    class Meta:
+        model = Website
+        # use default generated for:
+        #   hidden_domain, awstats_password, ats_purge_secret
+        fields = ['id', 'url', 'status', 'ip_address',
+                  'banjax_auth_hash', 'admin_key', 'options']
         read_only_fields = ['id']
+
+    # nested relations
+    options = WebsiteOptionSerializer(many=True)
 
     # Writable nested serializers
     @transaction.atomic
     def create(self, validated_data):
-        options = validated_data.pop('options')
+        try:
+            options = validated_data.pop('options')
+        except KeyError:
+            # no options in req
+            options = []
+
         website = Website.objects.create(**validated_data)
 
         for option in options:
@@ -48,14 +77,37 @@ class WebsiteSerializer(serializers.ModelSerializer):
 
         return website
 
+class WebsiteUpdateSerializer(serializers.ModelSerializer):
+    """
+    Update Serializer
+    All fields is updatable, except id, url
+    Used in /modify
+    """
+    class Meta:
+        model = Website
+        fields = ['id', 'url', 'status', 'ip_address',
+                  'hidden_domain', 'banjax_auth_hash',
+                  'admin_key', 'under_attack', 'awstats_password',
+                  'ats_purge_secret', 'options']
+        # Do not URL updates
+        read_only_fields = ['id', 'url']
+
+    # nested relations
+    options = WebsiteOptionSerializer(many=True)
+
     # Updatable nested serializers
     @transaction.atomic
     def update(self, instance, validated_data):
         # pop options
-        options = validated_data.pop('options')
+        try:
+            options = validated_data.pop('options')
+        except KeyError:
+            # no options in req
+            logging.debug('Update #%d: No options in update', instance.id)
+            options = []
 
         # call parent update function
-        updated_instance = super(WebsiteSerializer, self).update(
+        updated_instance = super(WebsiteUpdateSerializer, self).update(
             instance, validated_data)
 
         for option in options:
@@ -68,4 +120,4 @@ class WebsiteSerializer(serializers.ModelSerializer):
             except KeyError as err:
                 raise serializers.ValidationError("KeyError: %s" % str(err))
 
-        return instance
+        return updated_instance

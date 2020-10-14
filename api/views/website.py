@@ -4,14 +4,16 @@ from rest_framework import mixins, generics
 from rest_framework.response import Response
 
 from api.models import Website, WebsiteOption
-from api.serializers import WebsiteSerializer, WebsiteListSerializer, WebsiteOptionSerializer
+from api.serializers import (WebsiteSerializer, WebsiteDetailSerializer,
+                             WebsiteOptionSerializer, WebsiteUpdateSerializer,
+                             WebsiteCreateSerializer)
 
 
 class WebsiteList(mixins.ListModelMixin,
                   generics.GenericAPIView):
     """ /api/website/list """
     queryset = Website.objects.all()
-    serializer_class = WebsiteListSerializer  # do not show options
+    serializer_class = WebsiteSerializer  # do not show options
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -20,7 +22,7 @@ class WebsiteDetail(mixins.RetrieveModelMixin,
                     generics.GenericAPIView):
     """ /api/website/<int:pk> """
     queryset = Website.objects.all()
-    serializer_class = WebsiteSerializer
+    serializer_class = WebsiteDetailSerializer  # show options
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
@@ -29,7 +31,7 @@ class WebsiteCreate(mixins.CreateModelMixin,
                     generics.GenericAPIView):
     """ /api/website/create """
     queryset = Website.objects.all()
-    serializer_class = WebsiteSerializer
+    serializer_class = WebsiteCreateSerializer
 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
@@ -38,10 +40,10 @@ class WebsiteModify(mixins.UpdateModelMixin,
                     generics.GenericAPIView):
     """ /api/website/modify/<int:pk> """
     queryset = Website.objects.all()
-    serializer_class = WebsiteSerializer
+    serializer_class = WebsiteUpdateSerializer
 
     def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+        return self.partial_update(request, *args, **kwargs)
 
 class WebsiteDelete(mixins.DestroyModelMixin,
                     generics.GenericAPIView):
