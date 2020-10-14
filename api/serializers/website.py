@@ -1,3 +1,7 @@
+import json
+import logging
+import marshmallow
+
 from rest_framework import serializers
 from api.models import Website, WebsiteOption
 from .website_options import WebsiteOptionSerializer
@@ -11,7 +15,7 @@ class WebsiteListSerializer(serializers.ModelSerializer):
                   'hidden_domain', 'banjax_auth_hash',
                   'admin_key', 'under_attack', 'awstats_password',
                   'ats_purge_secret']
-        read_only_fields = ['id', 'url']
+        read_only_fields = ['id']
 
 class WebsiteSerializer(serializers.ModelSerializer):
     options = WebsiteOptionSerializer(many=True)
@@ -24,12 +28,17 @@ class WebsiteSerializer(serializers.ModelSerializer):
                   'hidden_domain', 'banjax_auth_hash',
                   'admin_key', 'under_attack', 'awstats_password',
                   'ats_purge_secret', 'options']
-        read_only_fields = ['id', 'url']
+        read_only_fields = ['id']
 
     # Writable nested serializers
     def create(self, validated_data):
         options = validated_data.pop('options')
         website = Website.objects.create(**validated_data)
         for option in options:
-            WebsiteOption.objects.create(website=website, **option)
+            try:
+                # Validate and create
+                website.set_option(option['name'], option['data'])
+            except marshmallow.ValidationError as err:
+                website.delete()
+                raise serializers.ValidationError(str(err))
         return website
