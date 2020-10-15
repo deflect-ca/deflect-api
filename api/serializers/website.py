@@ -59,7 +59,6 @@ class WebsiteCreateSerializer(serializers.ModelSerializer):
     # Writable nested serializers
     @transaction.atomic
     def create(self, validated_data):
-        logger.debug('WebsiteCreateSerializer.create')
         try:
             options = validated_data.pop('options')
             logger.debug(options)
@@ -106,6 +105,7 @@ class WebsiteUpdateSerializer(serializers.ModelSerializer):
         # pop options
         try:
             options = validated_data.pop('options')
+            logger.debug(options)
         except KeyError:
             # no options in req
             logger.debug('Update #%d: No options in update', instance.id)

@@ -1,3 +1,4 @@
+import logging
 import base64
 import hashlib
 import uuid
@@ -6,6 +7,8 @@ import random
 
 from django.db import models
 from .website_option import WebsiteOption
+
+logger = logging.getLogger(__name__)
 
 
 def generate_banjax_auth_hash(password):
@@ -90,9 +93,15 @@ class Website(models.Model):
 
         # create
         if option is None:
-            return self.options.create(name=key, data=valid_option[key])
+            self.options.create(name=key, data=valid_option[key])
+            logger.debug('#%d %s created option: %s -> %s',
+                self.id, self.url, key, str(valid_option[key]))
+            return
 
-        return self.options.update(data=valid_option[key])
+        self.options.filter(name=key).update(data=valid_option[key])
+        logger.debug('#%d %s updated option: %s -> %s',
+            self.id, self.url, key, str(valid_option[key]))
+        return
 
     def set_bulk_options(self, obj):
         for key in obj:
