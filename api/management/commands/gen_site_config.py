@@ -23,6 +23,9 @@ from six import reraise as raise_
 from api.models import Website, YamlDiff  # pylint: disable=no-name-in-module,import-error
 
 
+logger = logging.getLogger(__name__)
+
+
 class Command(BaseCommand):
     help = 'Generating site.yml according to database'
 
@@ -56,7 +59,7 @@ class Command(BaseCommand):
         This can either be called from the command line via manage.py
         or by a scheduled task.
         """
-        logging.info('Running gen_site_config command')
+        logger.info('Running gen_site_config command')
         blacklist_file = options['blacklist']
         output_location = options['output']
         debug = options['debug']
@@ -72,7 +75,7 @@ class Command(BaseCommand):
         partition_config = settings.GSC_PARTITIONS
         partition_to_sites = self.partition_dnets(partition_config, all_data)
         for partition, sites in partition_to_sites.items():
-            logging.error("number of sites in partition '%s': %s", partition, len(sites))
+            logger.info("number of sites in partition '%s': %s", partition, len(sites))
             self.write_config_if_changed(sites, os.path.join(output_location, partition), debug)
 
 
@@ -90,7 +93,7 @@ class Command(BaseCommand):
         site_details = [site for site in Website.objects.all()
                         if self.should_include_site(site, blacklist_list)]
 
-        logging.info('site_details length = %d', len(site_details))
+        logger.info('site_details length = %d', len(site_details))
 
         dumb_subsites = self.find_subsites(site_details)
 
@@ -119,7 +122,7 @@ class Command(BaseCommand):
                 parent_site_url = parent_site_get.get("parent")
                 parent_site_email = datadict[parent_site_url]["email"]
                 if parent_site_email != datadict[site_url]["email"]:
-                    logging.warning(
+                    logger.warning(
                         "WARNING!!!!\nThe logins for site %s and %s do not match - there's "
                         "a good chance someone is doing something malicious between %s and %s!\n"
                         "WARNING!!!", datadict[parent_site_url]["email"],
@@ -138,12 +141,12 @@ class Command(BaseCommand):
                 parent_site_url = parent_site_get.get("parent")
 
                 if debug:
-                    logging.info("Site %s is a subsite of %s", site_url, parent_site_url)
+                    logger.info("Site %s is a subsite of %s", site_url, parent_site_url)
 
                 subsite_dns_records = datadict[site_url]["dns_records"]
                 suffix = site_url.partition(parent_site_url)[0].strip(".")
                 if debug:
-                    logging.info("DNS suffix for %s is %s", site_url, suffix)
+                    logger.info("DNS suffix for %s is %s", site_url, suffix)
 
                 # Subsite records override all parent records with the same label if records exist
                 for record, values in six.iteritems(subsite_dns_records):
@@ -199,7 +202,7 @@ class Command(BaseCommand):
                 parent_site_url = parent_site_get.get("parent")
                 if parent_site_url not in datadict:
                     if debug:
-                        logging.info("Found sub-site %s but not its parent %s. Is the parent "
+                        logger.info("Found sub-site %s but not its parent %s. Is the parent "
                                     "blacklisted? Skipping sub-site!", site_url, parent_site_url)
                     del datadict[site_url]
                     continue
@@ -328,7 +331,7 @@ class Command(BaseCommand):
         if site.ats_purge_secret:
             site_dict["ats_purge_secret"] = site.ats_purge_secret
         else:
-            # logging.warning("XXX site %s has no ats_purge_secret", site.url)
+            logger.warning("XXX site %s has no ats_purge_secret", site.url)
             site_dict["ats_purge_secret"] = settings.GSC_REMAP_PURGE_DEFAULT_SECRET
 
         return site_dict
@@ -389,7 +392,7 @@ class Command(BaseCommand):
             if all([hasattr(record, field) for field in ["priority", "weight", "port"]]):
                 value = [int(record.priority), int(record.weight), int(record.port), value]
             else:
-                logging.info("Skipping SRV record %s for website %s due to missing "
+                logger.info("Skipping SRV record %s for website %s due to missing "
                             "parameters", hostname, site.url)
                 return {}
 
@@ -398,7 +401,7 @@ class Command(BaseCommand):
         # new DNS code is producing the same clients.yml output
         is_root = hostname in ["@", site_url, site_url + "."]
         if (is_root and record_type in ["A", "NS"]) or hostname == "www":
-            logging.debug("Skipping %s record %s with value %s", record_type, hostname, value)
+            logger.debug("Skipping %s record %s with value %s", record_type, hostname, value)
             return {}
 
         # XXX these invalid A records should not get this far, but they do. I've spent
@@ -408,7 +411,7 @@ class Command(BaseCommand):
             try:
                 ipaddress.ip_address(value)  # this raises ValueError if it can't parse an IP
             except ValueError:
-                logging.debug("Skipping %s record %s with value %s", record_type, hostname, value)
+                logger.debug("Skipping %s record %s with value %s", record_type, hostname, value)
                 return {}
 
         dicts[hostname] = {"type": record_type, "value": value}
@@ -447,16 +450,16 @@ class Command(BaseCommand):
         Decide if a site should be included in the clients.yml
         """
         if site.url in blacklist_list:
-            logging.info('EXCLUDE %s (blacklist)', site.url)
+            logger.info('EXCLUDE %s (blacklist)', site.url)
             return False
 
         if site.status < 3 and site.status != -1:
-            logging.info('EXCLUDE %s (status < 3 && != -1)', site.url)
+            logger.info('EXCLUDE %s (status < 3 && != -1)', site.url)
             return False
 
         # XXX Skip sites which have not been approved in Dashadmin
         if not site.get_option("approved") and not settings.GSC_IGNORE_APPROVAL:
-            logging.info('EXCLUDE %s (!approved)', site.url)
+            logger.info('EXCLUDE %s (!approved)', site.url)
             return False
 
         return True
@@ -535,17 +538,17 @@ class Command(BaseCommand):
             output_directory)
 
         if not maybe_old_filepath:
-            logging.info("First run in this output directory.")
+            logger.info("First run in this output directory.")
         elif raw_diff == {}:
-            logging.info("No site changes detected.")
+            logger.info("No site changes detected.")
             if not self.test:
                 return
             else:
-                logging.info("Test mode enabled (--test), continue")
+                logger.info("Test mode enabled (--test), continue")
         else:
-            logging.info("Site changes detected.")
+            logger.info("Site changes detected.")
 
-        logging.info("Deflect dashboard configuration updated")
+        logger.info("Deflect dashboard configuration updated")
 
         if debug:
             return
@@ -561,16 +564,16 @@ class Command(BaseCommand):
 
         os.symlink(new_filepath, os.path.join(output_directory, "site.yml"))
 
-        logging.info("Generated updated site.yml at %s", new_filepath)
+        logger.info("Generated updated site.yml at %s", new_filepath)
 
         try:
             # Stat(new_timestamp_s, new_config_dict, output_directory).save()
             # logger.info("Saved Stat for %s" % new_timestamp_s)
             yaml_diff.save()
-            logging.info("Saved YamlDiff for %s", new_timestamp_s)
+            logger.info("Saved YamlDiff for %s", new_timestamp_s)
         except Exception:
-            logging.error("Something wrong with YamlDiff")
-            logging.error("%s", traceback.format_exc())
+            logger.error("Something wrong with YamlDiff")
+            logger.error("%s", traceback.format_exc())
 
     def get_most_recent_config(self, output_location):
         configs = sorted(glob.glob(output_location + "/*.site.yml"))

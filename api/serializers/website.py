@@ -6,6 +6,8 @@ from rest_framework import serializers
 from api.models import Website, WebsiteOption
 from .website_options import WebsiteOptionSerializer
 
+logger = logging.getLogger(__name__)
+
 
 class WebsiteSerializer(serializers.ModelSerializer):
     """
@@ -52,15 +54,18 @@ class WebsiteCreateSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
     # nested relations
-    options = WebsiteOptionSerializer(many=True)
+    options = WebsiteOptionSerializer(many=True, required=False)
 
     # Writable nested serializers
     @transaction.atomic
     def create(self, validated_data):
+        logger.debug('WebsiteCreateSerializer.create')
         try:
             options = validated_data.pop('options')
+            logger.debug(options)
         except KeyError:
             # no options in req
+            logger.debug('empty options')
             options = []
 
         website = Website.objects.create(**validated_data)
@@ -103,7 +108,7 @@ class WebsiteUpdateSerializer(serializers.ModelSerializer):
             options = validated_data.pop('options')
         except KeyError:
             # no options in req
-            logging.debug('Update #%d: No options in update', instance.id)
+            logger.debug('Update #%d: No options in update', instance.id)
             options = []
 
         # call parent update function

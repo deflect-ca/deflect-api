@@ -8,6 +8,8 @@ from django.conf import settings
 
 from api.modules.edgemanage import edge_query, edge_conf, dnet_query
 
+logger = logging.getLogger(__name__)
+
 
 @api_view(['GET'])
 def api_info(request):
@@ -28,10 +30,10 @@ def api_edge_query(request):
     try:
         return Response(edge_query(request.GET['dnet']))
     except KeyError as err:
-        logging.error(err)
+        logger.error(err)
         return Response({"error": str(err)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as err:
-        logging.error(err)
+        logger.error(err)
         return Response({"error": str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -40,7 +42,7 @@ def api_dnet_query(request):
     try:
         return Response(dnet_query())
     except FileNotFoundError as err:
-        logging.error(err)
+        logger.error(err)
         return Response({"error": str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -58,8 +60,8 @@ def api_edge_conf(request):
             request.data['comment_user'])
         return Response(edge_conf_result, status=status.HTTP_201_CREATED)
     except KeyError as err:
-        logging.error(err)
+        logger.error(err)
         return Response({"error": str(err)}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as err:
-        logging.error(err)
+        logger.error(err)
         return Response({"error": str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

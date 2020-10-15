@@ -4,6 +4,8 @@ import logging
 from django.core.management.base import BaseCommand
 from api.models import WebsiteOption
 
+logger = logging.getLogger(__name__)
+
 
 class Command(BaseCommand):
     help = 'Import website options json'
@@ -20,12 +22,12 @@ class Command(BaseCommand):
         with open(options['file'], "r") as json_file:
             json_arr = json.loads(json_file.read())
 
-        logging.info('Load json with length = %s', str(len(json_arr)))
+        logger.info('Load json with length = %s', str(len(json_arr)))
 
         if len(json_arr) > 0:
             bulk_arr = []
             for w_option in json_arr:
-                logging.info('Insert %s => %s on site #%d',
+                logger.info('Insert %s => %s on site #%d',
                     w_option['name'], w_option['data'], w_option['website_id'])
                 bulk_arr.append(WebsiteOption(
                     website_id=w_option['website_id'],

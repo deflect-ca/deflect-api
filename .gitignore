@@ -132,3 +132,4 @@ tests/edgemanage/tmp/*.live
 
 dev/gen_site_config/*/*.yml
 dev/gen_site_config/*.sh
+dev/logs/*.log

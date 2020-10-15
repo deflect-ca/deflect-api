@@ -135,7 +135,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = env('TIME_ZONE', default='UTC')
 
 USE_I18N = True
 
@@ -160,19 +160,39 @@ EDGEMANAGE_TEST_EDGE = env('EDGEMANAGE_TEST_EDGE', default='deflect.ca')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'normal': {
+            'format': '[%(levelname)s] %(asctime)s (%(name)s:%(lineno)d): %(message)s'
+        },
+        'simple': {
+            'format': '[%(levelname)s] %(message)s'
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-        }
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',
+            'formatter': 'simple'
+        },
+        'file': {
+            'level': env('DEBUG_LOG_FILE_LEVEL', default='INFO'),
+            'class': 'logging.FileHandler',
+            'filename': env('DEBUG_LOG_FILE_PATH', default='dev/logs/debug.log'),
+            'formatter': 'normal'
+        },
+        'file-sql': {
+            'class': 'logging.FileHandler',
+            'filename': env('DEBUG_LOG_FILE_PATH', default='dev/logs/sql.log'),
+            'formatter': 'normal'
+        },
     },
     'loggers': {
+        '': {
+            'level': env('DEBUG_LOG_LEVEL', default='INFO'),
+            'handlers': ['console', 'file'],
+        },
         'django.db.backends': {
             'level': env('DEBUG_LOG_SQL_LEVEL', default='INFO'),
-            'handlers': ['console'],
+            'handlers': ['file-sql'],
         }
     }
 }
