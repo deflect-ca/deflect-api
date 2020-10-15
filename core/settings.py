@@ -157,6 +157,14 @@ EDGEMANAGE_CONFIG = env('EDGEMANAGE_CONFIG')
 EDGEMANAGE_DNET = env('EDGEMANAGE_DNET')
 EDGEMANAGE_TEST_EDGE = env('EDGEMANAGE_TEST_EDGE', default='deflect.ca')
 
+COLOR_LOG_SCHEMA = {
+    'DEBUG':    'cyan',
+    'INFO':     'green',
+    'WARNING':  'yellow',
+    'ERROR':    'red',
+    'CRITICAL': 'red,bg_white',
+}
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -167,11 +175,21 @@ LOGGING = {
         'simple': {
             'format': '[%(levelname)s] %(message)s'
         },
+        'normal-color': {
+            '()': 'colorlog.ColoredFormatter',
+            'format': '%(log_color)s%(levelname)s | %(asctime)s (%(name)s:%(lineno)d): %(message)s',
+            'log_colors': COLOR_LOG_SCHEMA,
+        },
+        'simple-color': {
+            '()': 'colorlog.ColoredFormatter',
+            'format': '%(log_color)s%(levelname)s (%(name)s:%(lineno)d) | %(message)s',
+            'log_colors': COLOR_LOG_SCHEMA,
+        }
     },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'simple-color'
         },
         'file': {
             'level': env('DEBUG_LOG_FILE_LEVEL', default='INFO'),
