@@ -43,7 +43,7 @@ jobs:
           destination: artifact-file
       - store_artifacts:
           name: Upload logs to artifacts
-          path: dev/logs/*.log
+          path: dev/logs
           destination: artifact-file
 
 workflows:
