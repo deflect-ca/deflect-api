@@ -5,6 +5,7 @@ from django.db import transaction
 from rest_framework import serializers
 from api.models import Website, WebsiteOption
 from .website_options import WebsiteOptionSerializer
+from .mixins import WebsiteValidationMixin
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +41,8 @@ class WebsiteDetailSerializer(serializers.ModelSerializer):
     # nested relations
     options = WebsiteOptionSerializer(many=True)
 
-class WebsiteCreateSerializer(serializers.ModelSerializer):
+class WebsiteCreateSerializer(serializers.ModelSerializer,
+                              WebsiteValidationMixin):
     """
     Create serializer with necessary fields only
     Used in /create

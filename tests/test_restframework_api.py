@@ -34,6 +34,28 @@ class RestFrameworkTestCase(TestCase):
         self.assertEqual(obj["url"], "test.com")
         self.assertEqual(obj["options"], [])
 
+        # invalid URL
+        response = self.client.post("/api/website/create", {
+            "url": "notvalidurl",
+            "status": 0,
+            "ip_address": "127.0.0.1",
+            "admin_key": "/wp-admin"
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Invalid URL notvalidurl", response.json().get('url')[0])
+
+        # invalid IP
+        response = self.client.post("/api/website/create", {
+            "url": "url.com",
+            "status": 0,
+            "ip_address": "127001",
+            "admin_key": "/wp-admin"
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Invalid IP 127001", response.json().get('ip_address')[0])
+
     def test_03_website_create_with_options(self):
         # with nested options
         options = [
@@ -215,7 +237,6 @@ class RestFrameworkTestCase(TestCase):
             ]
         }, format='json')
 
-        obj = response.json()
         self.assertEqual(response.status_code, 400)
         self.assertIn("Unknown field", response.json()[0])
 
