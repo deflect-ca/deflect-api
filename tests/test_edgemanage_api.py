@@ -6,7 +6,8 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, force_authenticate
 
-class APITestCase(TestCase):
+
+class EdgemanageAPITestCase(TestCase):
 
     def setUp(self):
         # Create test user
@@ -17,7 +18,7 @@ class APITestCase(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
 
     def test_api_auth_token(self):
-        # Issue a GET request.
+
         response = self.client.post('/api-token-auth/', {
             'username': 'testuser',
             'password': 'testpassword'
