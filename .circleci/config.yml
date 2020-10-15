@@ -38,7 +38,12 @@ jobs:
             coverage run --source . --omit='venv/*,edgemanage3/*' manage.py test
             coverage html
       - store_artifacts:
+          name: Upload htmlcov to artifacts
           path: htmlcov
+          destination: artifact-file
+      - store_artifacts:
+          name: Upload logs to artifacts
+          path: dev/logs/*.log
           destination: artifact-file
 
 workflows:

@@ -199,7 +199,7 @@ LOGGING = {
         },
         'file-sql': {
             'class': 'logging.FileHandler',
-            'filename': env('DEBUG_LOG_FILE_PATH', default='dev/logs/sql.log'),
+            'filename': env('DEBUG_LOG_SQL_FILE_PATH', default='dev/logs/sql.log'),
             'formatter': 'normal'
         },
     },
