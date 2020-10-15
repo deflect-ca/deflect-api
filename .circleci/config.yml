@@ -31,12 +31,13 @@ jobs:
           command: |
             mkdir /tmp/part1
             mkdir /tmp/part2
+      - python/save-cache
       - run:
           name: Test / Coverage Report
           command: |
+            pip install coverage
             coverage run --source . --omit='venv/*,edgemanage3/*' manage.py test
             coverage html
-      - python/save-cache
       - store_artifacts:
           name: Upload htmlcov to artifacts
           path: htmlcov
