@@ -9,7 +9,7 @@ jobs:
     executor: python/default
     steps:
       - checkout
-      #- python/load-cache
+      - python/load-cache
       - python/install-deps
       - run: git submodule update --init
       - run:
@@ -21,7 +21,7 @@ jobs:
       - run:
           name: Test edge_query
           command: edge_query --config tests/edgemanage/edgemanage.yaml --dnet test -v
-      #- python/save-cache
+      - python/save-cache
       - run:
           name: Setup SQLite on CI
           command: |
@@ -34,7 +34,9 @@ jobs:
             mkdir /tmp/part2
       - run:
           name: Test / Coverage Report
+          # manual install coverage again to avoid not found error (due to CI cache)
           command: |
+            pip install coverage
             coverage run --source . --omit='venv/*,edgemanage3/*' manage.py test
             coverage html
       - store_artifacts:

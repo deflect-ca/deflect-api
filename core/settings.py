@@ -211,6 +211,7 @@ LOGGING = {
         'django.db.backends': {
             'level': env('DEBUG_LOG_SQL_LEVEL', default='INFO'),
             'handlers': ['file-sql'],
+            'propagate': False,
         }
     }
 }
