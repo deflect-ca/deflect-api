@@ -1,12 +1,16 @@
+import logging
+
 from django.http import Http404
 
 from rest_framework import mixins, generics
 from rest_framework.response import Response
 
-from api.models import Website, WebsiteOption
+from api.models import Website, WebsiteOption, Record
 from api.serializers import (WebsiteSerializer, WebsiteDetailSerializer,
                              WebsiteOptionSerializer, WebsiteUpdateSerializer,
-                             WebsiteCreateSerializer)
+                             WebsiteCreateSerializer, RecordSerializer)
+
+logger = logging.getLogger(__name__)
 
 
 class WebsiteList(mixins.ListModelMixin,
@@ -85,3 +89,14 @@ class WebsiteOptionsDetail(mixins.RetrieveModelMixin,
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
+
+class WebsiteListRecords(mixins.ListModelMixin,
+                         generics.GenericAPIView):
+    """ /api/website/<int:pk>/records """
+    serializer_class = RecordSerializer
+
+    def get_queryset(self):
+        return Record.objects.filter(website_id=self.kwargs['pk'])
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
