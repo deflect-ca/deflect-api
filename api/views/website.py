@@ -8,7 +8,8 @@ from rest_framework.response import Response
 from api.models import Website, WebsiteOption, Record
 from api.serializers import (WebsiteSerializer, WebsiteDetailSerializer,
                              WebsiteOptionSerializer, WebsiteUpdateSerializer,
-                             WebsiteCreateSerializer, RecordSerializer)
+                             WebsiteCreateSerializer, RecordSerializer,
+                             RecordCreateSerializer)
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +43,7 @@ class WebsiteCreate(mixins.CreateModelMixin,
 
 class WebsiteModify(mixins.UpdateModelMixin,
                     generics.GenericAPIView):
-    """ /api/website/modify/<int:pk> """
+    """ /api/website/<int:pk>/modify """
     queryset = Website.objects.all()
     serializer_class = WebsiteUpdateSerializer
 
@@ -51,7 +52,7 @@ class WebsiteModify(mixins.UpdateModelMixin,
 
 class WebsiteDelete(mixins.DestroyModelMixin,
                     generics.GenericAPIView):
-    """ /api/website/delete/<int:pk> """
+    """ /api/website/<int:pk>/delete """
     queryset = Website.objects.all()
     serializer_class = WebsiteSerializer
 
@@ -100,3 +101,22 @@ class WebsiteListRecords(mixins.ListModelMixin,
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
+
+class WebsiteCreateRecord(mixins.CreateModelMixin,
+                          generics.GenericAPIView):
+    """ /api/website/<int:pk>/records/create """
+    serializer_class = RecordCreateSerializer
+
+    def get_queryset(self):
+        return Record.objects.filter(website_id=self.kwargs['pk'])
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+    def get_serializer(self, *args, **kwargs):
+        """
+        Override default method, insert website_id and call super
+        kwargs will be handled in serializer __init__
+        """
+        kwargs['website_id'] = self.kwargs['pk']
+        return super(WebsiteCreateRecord, self).get_serializer(*args, **kwargs)

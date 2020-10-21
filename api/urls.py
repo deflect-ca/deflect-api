@@ -22,6 +22,8 @@ urlpatterns = [
     path('website/<int:pk>/delete', website.WebsiteDelete.as_view()),
     path('website/<int:pk>/records',
         website.WebsiteListRecords.as_view(), name='website-records'),
+    path('website/<int:pk>/records/create',
+        website.WebsiteCreateRecord.as_view(), name='website-records-create'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
