@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 
 class OptionalSchemeURLValidator(URLValidator):
+
     def __call__(self, value):
         if '://' not in value:
             # Validate as if it were http://
