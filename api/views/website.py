@@ -120,3 +120,23 @@ class WebsiteCreateRecord(mixins.CreateModelMixin,
         """
         kwargs['website_id'] = self.kwargs['pk']
         return super(WebsiteCreateRecord, self).get_serializer(*args, **kwargs)
+
+class WebsiteRecordDetail(mixins.RetrieveModelMixin,
+                          generics.GenericAPIView):
+    """ /api/website/<int:pk>/records/<int:rpk> """
+    queryset = Record.objects.all()
+    serializer_class = RecordSerializer
+    lookup_url_kwarg = 'rpk'
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+class WebsiteDeleteRecord(mixins.DestroyModelMixin,
+                          generics.GenericAPIView):
+    """ /api/website/<int:pk>/records/<int:rpk>/delete """
+    queryset = Record.objects.all()
+    serializer_class = RecordSerializer
+    lookup_url_kwarg = 'rpk'
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
