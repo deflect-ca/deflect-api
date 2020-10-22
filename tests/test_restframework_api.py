@@ -252,3 +252,63 @@ class RestFrameworkTestCase(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertIn("KeyError", response.json()[0])
+
+    def test_09_website_record_list(self):
+        response = self.client.get("/api/website/1/records")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 5)
+
+    def test_10_website_record_create(self):
+        # this will also invoke named-checkzone
+        response = self.client.post("/api/website/1/records/create", {
+            "type": "A",
+            "hostname": "test",
+            "value": "127.0.0.1"
+        })
+
+        obj = response.json()
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(obj["type"], "A")
+        self.assertEqual(obj["hostname"], "test")
+        self.assertEqual(obj["value"], "127.0.0.1")
+
+    def test_11_website_record_create_error(self):
+        # this will also invoke named-checkzone
+        response = self.client.post("/api/website/1/records/create", {
+            "type": "A",
+            "hostname": "test",
+            "value": "invalid_ip"
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("dns_rdata_fromtext", response.json()[0])
+
+    def test_12_website_record_update(self):
+        # this will also invoke named-checkzone
+        response = self.client.put("/api/website/1/records/1/modify", {
+            "hostname": "ftps",  # ftp originally
+        })
+
+        obj = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(obj['hostname'], "ftps")
+
+    def test_13_website_record_update_error(self):
+        # this will also invoke named-checkzone
+        response = self.client.put("/api/website/1/records/1/modify", {
+            "value": "invalid_ip",
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("dns_rdata_fromtext", response.json()[0])
+
+    def test_14_website_record_detail(self):
+        response = self.client.get("/api/website/1/records/1")
+        self.assertEqual(response.status_code, 200)
+
+        obj = response.json()
+        self.assertEqual(obj['type'], 'A')
+
+    def test_15_website_record_delete(self):
+        response = self.client.delete("/api/website/1/records/1/delete")
+        self.assertEqual(response.status_code, 204)

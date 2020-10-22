@@ -39,7 +39,7 @@ class EdgemanageAPITestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_dnet_query(self):
-        response = self.client.get('/api/edge/dnet')
+        response = self.client.get('/api/dnet/list')
 
         # Check that the response is 200 OK.
         self.assertEqual(response.status_code, 200)
