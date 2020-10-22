@@ -144,7 +144,7 @@ class DNSUtils():
         """
         Call named-checkzone to validate the entered DNS records.
         """
-        with tempfile.NamedTemporaryFile() as zone_file:
+        with tempfile.NamedTemporaryFile(mode='w') as zone_file:
             # Write the zone file to a temporary location
             zone_file.write(zone_data)
             zone_file.flush()

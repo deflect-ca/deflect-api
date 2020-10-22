@@ -111,6 +111,7 @@ class WebsiteCreateRecord(mixins.CreateModelMixin,
         return Record.objects.filter(website_id=self.kwargs['pk'])
 
     def post(self, request, *args, **kwargs):
+        # calls serializer.save()
         return self.create(request, *args, **kwargs)
 
     def get_serializer(self, *args, **kwargs):

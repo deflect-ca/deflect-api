@@ -1,5 +1,6 @@
 import logging
 
+from django.db import transaction
 from rest_framework import serializers
 from api.modules.dns import DNSUtils, InvalidZoneFile
 from api.models import Record
@@ -25,10 +26,12 @@ class RecordCreateSerializer(serializers.ModelSerializer):
         """
         Override default constructor
         remove website_id which will be used in save()
+        (called from views.website)
         """
         self.website_id = kwargs.pop('website_id')
         super(RecordCreateSerializer, self).__init__(*args, **kwargs)
 
+    @transaction.atomic
     def save(self, **kwargs):
         # Insert self.website_id to kwargs which will be merged with validated_data
         record = super(
@@ -42,4 +45,5 @@ class RecordCreateSerializer(serializers.ModelSerializer):
             dns_util.create_and_validate_zone_file(website, records)
         except InvalidZoneFile as err:
             # Rollback new record, return validation errors to the user.
+            logger.critical('Invalid zone! rollback triggered')
             raise serializers.ValidationError(str(err))
