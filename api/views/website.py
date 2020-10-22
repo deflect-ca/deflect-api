@@ -9,7 +9,7 @@ from api.models import Website, WebsiteOption, Record
 from api.serializers import (WebsiteSerializer, WebsiteDetailSerializer,
                              WebsiteOptionSerializer, WebsiteUpdateSerializer,
                              WebsiteCreateSerializer, RecordSerializer,
-                             RecordCreateSerializer)
+                             RecordCreateSerializer, RecordModifySerializer)
 
 logger = logging.getLogger(__name__)
 
@@ -141,3 +141,13 @@ class WebsiteDeleteRecord(mixins.DestroyModelMixin,
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
+
+class WebsiteModifyRecord(mixins.UpdateModelMixin,
+                          generics.GenericAPIView):
+    """ /api/website/<int:pk>/records/<int:rpk>/modify """
+    queryset = Record.objects.all()
+    serializer_class = RecordModifySerializer
+    lookup_url_kwarg = 'rpk'
+
+    def put(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)

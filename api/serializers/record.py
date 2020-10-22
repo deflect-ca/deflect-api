@@ -1,11 +1,7 @@
-import logging
-
 from django.db import transaction
 from rest_framework import serializers
-from api.modules.dns import DNSUtils, InvalidZoneFile
 from api.models import Record
-
-logger = logging.getLogger(__name__)
+from .mixins import RecordValidationMixin
 
 
 class RecordSerializer(serializers.ModelSerializer):
@@ -15,11 +11,12 @@ class RecordSerializer(serializers.ModelSerializer):
         fields = ['id', 'type', 'hostname', 'value', 'priority',
                   'weight', 'port', 'ttl']
 
-class RecordCreateSerializer(serializers.ModelSerializer):
+class RecordCreateSerializer(serializers.ModelSerializer,
+                             RecordValidationMixin):
 
     class Meta:
         model = Record
-        fields = ['id', 'type', 'hostname', 'value', 'priority',
+        fields = ['type', 'hostname', 'value', 'priority',
                   'weight', 'port', 'ttl', 'website_id']
 
     def __init__(self, *args, **kwargs):
@@ -36,14 +33,17 @@ class RecordCreateSerializer(serializers.ModelSerializer):
         # Insert self.website_id to kwargs which will be merged with validated_data
         record = super(
             RecordCreateSerializer, self).save(website_id=self.website_id)
-        website = record.website
-        records = website.records.all()
+        self.record_validator(record)
 
-        try:
-            # insert new record
-            dns_util = DNSUtils()
-            dns_util.create_and_validate_zone_file(website, records)
-        except InvalidZoneFile as err:
-            # Rollback new record, return validation errors to the user.
-            logger.critical('Invalid zone! rollback triggered')
-            raise serializers.ValidationError(str(err))
+class RecordModifySerializer(serializers.ModelSerializer,
+                             RecordValidationMixin):
+
+    class Meta:
+        model = Record
+        fields = ['type', 'hostname', 'value', 'priority',
+                  'weight', 'port', 'ttl']
+
+    @transaction.atomic
+    def save(self, **kwargs):
+        record = super(RecordModifySerializer, self).save()
+        self.record_validator(record)

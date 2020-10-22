@@ -250,6 +250,5 @@ class RestFrameworkTestCase(TestCase):
             ]
         }, format='json')
 
-        obj = response.json()
         self.assertEqual(response.status_code, 400)
         self.assertIn("KeyError", response.json()[0])

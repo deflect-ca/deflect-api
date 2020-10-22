@@ -1,1 +1,2 @@
 from .website_validation import WebsiteValidationMixin
+from .record_validation import RecordValidationMixin
