@@ -112,7 +112,8 @@ class Command(BaseCommand):
 
         return dict(datadict)
 
-    def remove_differently_owned_subsites(self, datadict, dumb_subsites):
+    @staticmethod
+    def remove_differently_owned_subsites(datadict, dumb_subsites):
         for site_url in list(datadict.keys()):
             parent_site_get = dumb_subsites.get(site_url)
 
@@ -131,7 +132,8 @@ class Command(BaseCommand):
                     continue
         return datadict
 
-    def merge_subsite_records_under_parent(self, datadict, dumb_subsites, debug):
+    @staticmethod
+    def merge_subsite_records_under_parent(datadict, dumb_subsites, debug):
         for site_url in datadict.keys():
             parent_site_get = dumb_subsites.get(site_url)
 

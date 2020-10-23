@@ -56,3 +56,58 @@ class GenSiteConfigTestCase(TestCase):
         datadict = {"test.example.com": "blah"}
         subsites = {"test.example.com": {"parent": "example.com", "parent_creator_id": "blah2"}}
         self.assertEqual(gsc.remove_orphans(datadict, subsites, False), {})
+
+    def test_remove_differently_owned_subsites_one_bad_subsite(self):
+        """
+        If a child site is owned by someone different than the parent site is,
+        remove the child site.
+        In this test, the subsite is should be removed.
+        """
+        datadict = {"example.com":
+                    {"email": "joe@example.com"},
+                    "test.example.com":
+                        {"email": "joe@evil.com"}
+                    }
+        subsites = {"test.example.com":
+                    {"parent": "example.com", "parent_creator_id": "blah3"}
+                    }
+        self.assertTrue("test.example.com" not in gsc.remove_differently_owned_subsites(datadict, subsites))
+
+    def test_merge_subsite_records_under_parent(self):
+        """
+        In this test, the subsite has no dns_records. The subdomain should
+        point to the root domain in a CNAME record.
+        """
+        datadict = {"example.com":
+                    {"dns_records":
+                    {"@": [
+                        {"type": "A",
+                        "value": ["x.x.x.x"]
+                        }
+                    ]}
+                    },
+                    "test.example.com":
+                        {"dns_records": {}
+                        }
+                    }
+        subsites = {"test.example.com":
+                    {"parent": "example.com", "parent_creator_id": "blah3"}
+                    }
+        expected_merged = {"example.com":
+                        {"dns_records":
+                            {"@":
+                            [{"type": "A",
+                            "value": ["x.x.x.x"]
+                            }
+                            ],
+                            "test":
+                            [{"type": "CNAME",
+                            "value": "example.com."
+                            }
+                            ]
+                            }
+                            },
+                        "test.example.com": {}
+                        }
+        merged = gsc.merge_subsite_records_under_parent(datadict, subsites, False)
+        self.assertTrue(merged == expected_merged)
