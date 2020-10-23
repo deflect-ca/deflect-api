@@ -11,8 +11,9 @@ jobs:
       - checkout
       - python/load-cache
       - python/install-deps
-      # Install named-checkzone
-      - run: DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --force-yes bind9utils
+      - run:
+          name: Install deps with apt-get
+          command: DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --force-yes bind9utils
       - run: git submodule update --init
       - run:
           name: Install edgemanage
