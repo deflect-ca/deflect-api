@@ -238,3 +238,6 @@ GSC_DEFAULT_CACHE_TIME = env('GSC_DEFAULT_CACHE_TIME', default=10)
 GSC_DEFAULT_NETWORK = env('GSC_DEFAULT_NETWORK', default='dnet1')
 GSC_REMAP_PURGE_DEFAULT_SECRET = "some-dummy-secret"
 GSC_IGNORE_APPROVAL = env('GSC_IGNORE_APPROVAL', default=True)
+
+# Celery
+CELERY_BROKER_URL = 'amqp://localhost'
