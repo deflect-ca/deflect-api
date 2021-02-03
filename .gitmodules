@@ -2,3 +2,6 @@
 	path = edgemanage3
 	url = https://github.com/equalitie/edgemanage.git
 	branch = feature/python3-migration
+[submodule "deflect_next"]
+	path = deflect_next
+	url = git@github.com:equalitie/deflect-next.git
