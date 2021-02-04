@@ -79,3 +79,5 @@ class Command(BaseCommand):
 
         logger.info('generate_auth_server_config')
         generate_auth_server_config.main(config, all_sites, formatted_time, output_prefix=output_dir)
+
+        install_delta_config.main(config, all_sites, formatted_time, formatted_time, output_prefix=output_dir)
