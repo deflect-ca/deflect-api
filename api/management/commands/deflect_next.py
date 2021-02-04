@@ -1,10 +1,13 @@
 from datetime import datetime
 
+import os
 import logging
 import yaml
 
 from django.core.management.base import BaseCommand
 from deflect_next.orchestration import old_to_new_site_dict
+from deflect_next.orchestration import install_delta_config
+from deflect_next.orchestration import generate_bind_config
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +27,13 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '-o', '--output',
-            help='output path for new sites.yml file'
+            help='output path for new sites.yml file (only dir)'
+        )
+        parser.add_argument(
+            '-p', '--prod',
+            default=False,
+            action='store_true',
+            help='Default is staging mode'
         )
 
 
@@ -36,5 +45,24 @@ class Command(BaseCommand):
 
         time = datetime.fromtimestamp(float(old_sites_yml["timestamp"]) / 1000.0)
         formatted_time = time.strftime("%Y-%m-%d_%H:%M:%S")
+        output_dir = f"{options['output']}/{formatted_time}"
+
+        if not os.path.isdir(output_dir):
+            os.mkdir(output_dir)
 
         old_to_new_site_dict.main(old_sites_yml, options['output'])
+
+        config = {}
+        with open(options['config'], 'r') as file_config:
+            config = yaml.load(file_config.read(), Loader=yaml.FullLoader)
+
+        all_sites = {}
+        with open(f"{output_dir}/new-sites.yml", 'r') as file_all_sites:
+            all_sites = yaml.load(file_all_sites.read(), Loader=yaml.FullLoader)
+
+        if not options['prod']:
+            all_sites = install_delta_config.add_staging_zone(all_sites, config)
+
+        print(all_sites)
+
+        generate_bind_config.main(config, all_sites, formatted_time, output_prefix=output_dir)
