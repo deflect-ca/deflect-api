@@ -8,6 +8,7 @@ from django.core.management.base import BaseCommand
 from deflect_next.orchestration import old_to_new_site_dict
 from deflect_next.orchestration import install_delta_config
 from deflect_next.orchestration import generate_bind_config
+from deflect_next.orchestration import generate_nginx_config
 
 logger = logging.getLogger(__name__)
 
@@ -66,3 +67,5 @@ class Command(BaseCommand):
         print(all_sites)
 
         generate_bind_config.main(config, all_sites, formatted_time, output_prefix=output_dir)
+        # decrypt_and_verify_cert_bundles.main(all_sites, formatted_time)
+        generate_nginx_config.main(all_sites, config, formatted_time, output_prefix=output_dir)
