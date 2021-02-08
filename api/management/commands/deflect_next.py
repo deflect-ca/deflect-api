@@ -37,6 +37,13 @@ class Command(BaseCommand):
             action='store_true',
             help='Default is staging mode'
         )
+        parser.add_argument(
+            '-g', '--genonly',
+            default=False,
+            action='store_true',
+            help='Default is not gen only mode'
+        )
+
 
 
     def handle(self, *args, **options):
@@ -53,7 +60,7 @@ class Command(BaseCommand):
             os.mkdir(output_dir)
 
         logger.info('old_to_new_site_dict')
-        old_to_new_site_dict.main(old_sites_yml, options['output'])
+        old_to_new_site_dict.main(old_sites_yml, output_dir)
 
         config = {}
         with open(options['config'], 'r') as file_config:
@@ -80,4 +87,8 @@ class Command(BaseCommand):
         logger.info('generate_auth_server_config')
         generate_auth_server_config.main(config, all_sites, formatted_time, output_prefix=output_dir)
 
-        install_delta_config.main(config, all_sites, formatted_time, formatted_time, output_prefix=output_dir)
+        if not options['genonly']:
+            logger.info('install_delta_config')
+            install_delta_config.main(config, all_sites, formatted_time, formatted_time, output_prefix=output_dir)
+        else:
+            logger.info('genonly presented, ending successfully')
