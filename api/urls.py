@@ -23,7 +23,7 @@ urlpatterns = [
     # TODO:
     #   dnet/create
     #   dnet/modify
-    #   ndnet/delete
+    #   dnet/delete
 
     # website
     path('website/list',
