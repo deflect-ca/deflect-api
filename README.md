@@ -1,6 +1,6 @@
 # Deflect Core
 
-This project serves as the core of Deflect, several componenet is integrated within this project including edgemanage, database for storing DNS and website record, API and `gen_site_config`, which generated site.yml for use in `deflect-next`.
+This project serves as the core of Deflect, several componenet is integrated within this project including edgemanage, database for storing DNS and website record, API and `gen_site_config`, which generates `site.yml` for use in `deflect-next`.
 
 ![system-diagram](docs/deflect-core-diagram.png)
 
@@ -32,6 +32,10 @@ After that, we could setup deflect-core, edit `.env` and setup database
     cp core/.env.example core/.env
     python manage.py migrate
     python manage.py createsuperuser --email admin@example.com --username admin
+
+Start the dev server with
+
+    python manage.py runserver
 
 ### Edgemanage
 
@@ -99,7 +103,7 @@ This command executes `deepdiff` on two givne YAML file, and generates a differe
 
 ## Tests
 
-Invoke django test. Test includes API, Model and gen_site_config test, this will read your local `.env` file. `.env.ci` is only used on CircleCI.
+Invoke django test. Test includes API, Model and gen_site_config test, this will read your local `.env` file. For CircleCI tests, please refer to config in `.circleci`, test coverage report is also generated with automate test.
 
     python manage.py test
 
