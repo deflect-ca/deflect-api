@@ -3,6 +3,7 @@ from datetime import datetime
 import os
 import logging
 import yaml
+import ssh_agent_setup
 
 from django.core.management.base import BaseCommand
 from deflect_next.orchestration import old_to_new_site_dict
@@ -43,7 +44,15 @@ class Command(BaseCommand):
             action='store_true',
             help='Default is not gen only mode'
         )
+        parser.add_argument(
+            '-k', '--key',
+            help='SSH key file path'
+        )
 
+
+    def load_ssh_key(self, key_path):
+        ssh_agent_setup.setup()
+        ssh_agent_setup.addKey(os.path.expanduser(key_path))
 
 
     def handle(self, *args, **options):
@@ -88,6 +97,8 @@ class Command(BaseCommand):
         generate_auth_server_config.main(config, all_sites, formatted_time, output_prefix=output_dir)
 
         if not options['genonly']:
+            logger.info(f"load ssh key from: {options['key']}")
+            self.load_ssh_key(options['key'])
             logger.info('install_delta_config')
             install_delta_config.main(config, all_sites, formatted_time, formatted_time, output_prefix=output_dir)
         else:
