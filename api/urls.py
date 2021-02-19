@@ -5,26 +5,6 @@ from .views import edgemanage, website
 
 urlpatterns = [
 
-    # edgemanage
-    path('info',
-        edgemanage.api_info, name='api_info'),
-    path('edge/list',
-        edgemanage.api_edge_query, name='api_edge_list'),
-    path('edge/config',
-        edgemanage.api_edge_conf, name='api_edge_config'),
-    # TODO:
-    #   edge/create
-    #   edge/modify
-    #   edge/delete
-
-    # dnet
-    path('dnet/list',
-        edgemanage.api_dnet_query, name='api_dnet_list'),
-    # TODO:
-    #   dnet/create
-    #   dnet/modify
-    #   dnet/delete
-
     # website
     path('website/list',
         website.WebsiteList.as_view(), name='api_website_list'),
@@ -54,6 +34,24 @@ urlpatterns = [
         website.WebsiteModifyRecord.as_view(), name='api_website_modify_record'),
     path('website/<int:pk>/records/<int:rpk>/delete',
         website.WebsiteDeleteRecord.as_view(), name='api_website_delete_record'),
+
+    # edgemanage
+    path('edge/list',
+        edgemanage.Edge.as_view(), name='api_edge_list'),
+    path('edge/config',
+        edgemanage.EdgeConf.as_view(), name='api_edge_config'),
+    # TODO:
+    #   edge/create
+    #   edge/modify
+    #   edge/delete
+
+    # dnet
+    path('dnet/list',
+        edgemanage.Dnet.as_view(), name='api_dnet_list'),
+    # TODO:
+    #   dnet/create
+    #   dnet/modify
+    #   dnet/delete
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
