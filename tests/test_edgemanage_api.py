@@ -45,7 +45,7 @@ class EdgemanageAPITestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_edge_conf(self):
-        response = self.client.post('/api/edge/config', {
+        response = self.client.put('/api/edge/config', {
             'dnet': settings.EDGEMANAGE_DNET,
             'edge': settings.EDGEMANAGE_TEST_EDGE,
             'mode': 'unavailable',
