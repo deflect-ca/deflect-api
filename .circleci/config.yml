@@ -52,15 +52,15 @@ jobs:
       - store_artifacts:
           name: Upload htmlcov to artifacts
           path: htmlcov
-          destination: artifact-file
+          destination: coverage-report
       - store_artifacts:
           name: Upload logs to artifacts
           path: dev/logs
-          destination: artifact-file
+          destination: logs
       - store_artifacts:
           name: Upload API docs to artifacts
           path: docs/api-docs
-          destination: artifact-file
+          destination: api-docs
 
 workflows:
   main:
