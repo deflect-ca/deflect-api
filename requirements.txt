@@ -13,7 +13,7 @@ django-environ==0.4.5
 django-filter==2.3.0
 django-mysql==3.8.1
 django-yamlfield==1.0.3
-djangorestframework==3.11.1
+djangorestframework==3.12.2
 idna==2.10
 importlib-metadata==1.7.0
 ipaddr==2.2.0
