@@ -44,7 +44,7 @@ jobs:
       - run:
           name: Generate API Docs
           command: |
-            pip install apistar==0.7.2
+            python -m pip install git+https://github.com/jeremy5189/apistar
             pip install uritemplate==3.0.1
             python manage.py generateschema --title 'Deflect Core API Documentation' --format openapi-json > docs/schema.json
             python manage.py docs_proc -i docs/schema.json -o docs/schema-altered.json
