@@ -136,3 +136,5 @@ dev/logs/*.log
 dev/deflect_next/input/*.yml
 !dev/deflect_next/input/*.sample.yml
 dev/deflect_next/output
+
+docs/*.json

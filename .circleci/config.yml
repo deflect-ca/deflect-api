@@ -41,6 +41,12 @@ jobs:
             pip install coverage
             coverage run --source . --omit='venv/*,edgemanage3/*' manage.py test
             coverage html
+      - run:
+          name: Generate API Docs
+          command: |
+            python manage.py generateschema --title 'Deflect Core API Documentation' --format openapi-json > docs/schema.json
+            python manage.py docs_proc -i docs/schema.json -o docs/schema-altered.json
+            apistar docs --path docs/schema-altered.json --format openapi --theme apistar --output-dir docs/api-docs
       - store_artifacts:
           name: Upload htmlcov to artifacts
           path: htmlcov
@@ -48,6 +54,10 @@ jobs:
       - store_artifacts:
           name: Upload logs to artifacts
           path: dev/logs
+          destination: artifact-file
+      - store_artifacts:
+          name: Upload API docs to artifacts
+          path: docs/api-docs
           destination: artifact-file
 
 workflows:
