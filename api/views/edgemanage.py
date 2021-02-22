@@ -1,4 +1,5 @@
 import logging
+import json
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -13,9 +14,10 @@ logger = logging.getLogger(__name__)
 
 
 class Edge(APIView):
-    schema = CustomSchema(tags=['edgemanage'])
+    schema = CustomSchema(tags=['edgemanage'], load_api_yaml=True)
 
     def get(self, request):
+        """ List all edges currently managed by edgemanage """
         try:
             return Response(edge_query(request.GET['dnet']))
         except KeyError as err:
@@ -27,9 +29,10 @@ class Edge(APIView):
 
 
 class Dnet(APIView):
-    schema = CustomSchema(tags=['dnet'])
+    schema = CustomSchema(tags=['dnet'], load_api_yaml=True)
 
     def get(self, request):
+        """ List all dnets managed by edgemanage """
         try:
             return Response(dnet_query())
         except FileNotFoundError as err:
@@ -38,9 +41,10 @@ class Dnet(APIView):
 
 
 class EdgeConf(APIView):
-    schema = CustomSchema(tags=['edgemanage'])
+    schema = CustomSchema(tags=['edgemanage'], load_api_yaml=True)
 
     def put(self, request):
+        """ Update edge config, put the edge in or out of rotation """
         try:
             edge_conf_result = edge_conf(
                 request.data['dnet'], request.data['edge'],
