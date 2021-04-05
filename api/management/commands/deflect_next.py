@@ -97,7 +97,7 @@ class Command(BaseCommand):
         generate_bind_config.main(config, all_sites, formatted_time, output_prefix=output_dir)
 
         logger.info('decrypt_and_verify_cert_bundles')
-        decrypt_and_verify_cert_bundles.main(all_sites, formatted_time)
+        decrypt_and_verify_cert_bundles.main(all_sites, formatted_time, config, output_prefix=output_dir)
 
         logger.info('generate_nginx_config')
         generate_nginx_config.main(all_sites, config, formatted_time, output_prefix=output_dir)
