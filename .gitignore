@@ -138,3 +138,4 @@ dev/deflect_next/input/*.yml
 dev/deflect_next/output
 
 docs/*.json
+dev/deflect_next/input/*.tar
