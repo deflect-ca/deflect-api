@@ -103,7 +103,8 @@ class Command(BaseCommand):
         generate_nginx_config.main(all_sites, config, formatted_time, output_prefix=output_dir)
 
         logger.info('generate_banjax_next_config')
-        generate_banjax_next_config.main(config, all_sites, formatted_time)
+        generate_banjax_next_config.main(
+            config, all_sites, formatted_time, output_prefix=output_dir)
 
         if not options['genonly']:
             logger.info(f"load ssh key from: {options['key']}")
