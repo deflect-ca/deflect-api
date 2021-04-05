@@ -3,6 +3,7 @@ from datetime import datetime
 import os
 import logging
 import yaml
+import json
 import ssh_agent_setup
 
 from django.core.management.base import BaseCommand
@@ -29,6 +30,10 @@ class Command(BaseCommand):
         parser.add_argument(
             '-s', '--sites',
             help='sites.yml file'
+        )
+        parser.add_argument(
+            '-y', '--sys',
+            help='system sites.yml file'
         )
         parser.add_argument(
             '-o', '--output',
@@ -74,17 +79,19 @@ class Command(BaseCommand):
             os.mkdir(output_dir)
 
         logger.info('old_to_new_site_dict')
-        old_to_new_site_dict.main(old_sites, old_sites_timestamp, output_prefix=output_dir)
+        new_client_sites = old_to_new_site_dict.main(
+            old_sites, old_sites_timestamp, output_prefix=output_dir)
+
+        system_sites = {}
+        with open(options['sys'], "r") as f:
+            system_sites = yaml.load(f.read(), Loader=yaml.FullLoader)
 
         config = {}
         with open(options['config'], 'r') as file_config:
             config = yaml.load(file_config.read(), Loader=yaml.FullLoader)
 
-        all_sites = {}
-        with open(f"{output_dir}/new-sites.yml", 'r') as file_all_sites:
-            all_sites = yaml.load(file_all_sites.read(), Loader=yaml.FullLoader)
-
-        print(all_sites)
+        all_sites = {'client': new_client_sites, 'system': system_sites}
+        logger.debug(json.dumps(all_sites, indent=2))
 
         logger.info('generate_bind_config')
         generate_bind_config.main(config, all_sites, formatted_time, output_prefix=output_dir)
