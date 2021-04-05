@@ -8,9 +8,11 @@ import ssh_agent_setup
 from django.core.management.base import BaseCommand
 from deflect_next.orchestration import old_to_new_site_dict
 from deflect_next.orchestration import install_delta_config
+
 from deflect_next.orchestration import generate_bind_config
+from deflect_next.orchestration import decrypt_and_verify_cert_bundles
 from deflect_next.orchestration import generate_nginx_config
-from deflect_next.orchestration import generate_auth_server_config
+from deflect_next.orchestration import generate_banjax_next_config
 
 logger = logging.getLogger(__name__)
 
@@ -60,16 +62,19 @@ class Command(BaseCommand):
         old_sites_yml = {}
         with open(options['sites'], "r") as file_sites:
             old_sites_yml = yaml.load(file_sites.read(), Loader=yaml.FullLoader)
+            old_sites_timestamp = old_sites_yml["timestamp"]
+            old_sites = old_sites_yml["remap"]
 
         time = datetime.fromtimestamp(float(old_sites_yml["timestamp"]) / 1000.0)
         formatted_time = time.strftime("%Y-%m-%d_%H:%M:%S")
         output_dir = f"{options['output']}/{formatted_time}"
 
         if not os.path.isdir(output_dir):
+            logger.info(f"mkdir {output_dir}")
             os.mkdir(output_dir)
 
         logger.info('old_to_new_site_dict')
-        old_to_new_site_dict.main(old_sites_yml, output_dir)
+        old_to_new_site_dict.main(old_sites, old_sites_timestamp, output_prefix=output_dir)
 
         config = {}
         with open(options['config'], 'r') as file_config:
@@ -79,22 +84,19 @@ class Command(BaseCommand):
         with open(f"{output_dir}/new-sites.yml", 'r') as file_all_sites:
             all_sites = yaml.load(file_all_sites.read(), Loader=yaml.FullLoader)
 
-        if not options['prod']:
-            all_sites = install_delta_config.add_staging_zone(all_sites, config)
-
         print(all_sites)
 
         logger.info('generate_bind_config')
         generate_bind_config.main(config, all_sites, formatted_time, output_prefix=output_dir)
 
-        # logger.info('decrypt_and_verify_cert_bundles')
-        # decrypt_and_verify_cert_bundles.main(all_sites, formatted_time)
+        logger.info('decrypt_and_verify_cert_bundles')
+        decrypt_and_verify_cert_bundles.main(all_sites, formatted_time)
 
         logger.info('generate_nginx_config')
         generate_nginx_config.main(all_sites, config, formatted_time, output_prefix=output_dir)
 
-        logger.info('generate_auth_server_config')
-        generate_auth_server_config.main(config, all_sites, formatted_time, output_prefix=output_dir)
+        logger.info('generate_banjax_next_config')
+        generate_banjax_next_config.main(config, all_sites, formatted_time)
 
         if not options['genonly']:
             logger.info(f"load ssh key from: {options['key']}")
