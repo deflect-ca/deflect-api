@@ -1,8 +1,38 @@
 # Deflect Core
 
-This project serves as the core of Deflect, several componenet is integrated within this project including edgemanage, database for storing DNS and website record, API and `gen_site_config`, which generates `site.yml` for use in `deflect-next`.
+This project serves as the core of Deflect, several componenet is integrated within this project including edgemanage, database for storing DNS and website record, API and gen_site_config module.
 
 ![system-diagram](docs/deflect-core-diagram.png)
+
+## Overview
+
+- Deflect-core is based on Django framework
+- Uses MySQL as database to store:
+  - website list
+  - website options and config
+  - DNS records
+- gen_site_config script (django command line script) generates site.yml according to database
+- Provides an HTTP API to interact with database
+- Provides an Web interface to interact with database (django admin)
+- Works with two submodules:
+  - edgemanage3
+  - deflect-next
+- edgemanage3:
+  - python integration
+  - feature:
+    - edge_query: query edge status
+    - edge_conf: configure edge
+- deflect-next
+  - python integration
+  - triggers when there is an change in the database
+  - input
+    - config.yml (with edge information from edgemanage3, controller and banjax_next configs)
+    - site.yml (generated with gen_site_config)
+  - features
+    - push new site.yml to deflect-next network
+    - provision new deflect-next edge
+    - provision new deflect-next controller
+
 
 ## Provisioning and Deployment
 
@@ -119,4 +149,4 @@ REST framework provides built-in GUI for API testing, auth is required by clicki
 
 ## API Documentation
 
-Please refer to [API Documentation](docs/API.md)
+Please refer to [HTTP API Documentation](https://equalitie.github.io/deflect-core/)
