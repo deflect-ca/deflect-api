@@ -42,13 +42,23 @@ jobs:
             coverage run --source . --omit='venv/*,edgemanage3/*' manage.py test
             coverage html
       - run:
-          name: Generate API Docs
+          name: Install deps for api docs
           command: |
             python -m pip install git+https://github.com/jeremy5189/apistar
             pip install uritemplate==3.0.1
+      - run:
+          name: Generate API Docs
+          command: |
             python manage.py generateschema --title 'Deflect Core API Documentation' --format openapi-json > docs/schema.json
             python manage.py docs_proc -i docs/schema.json -o docs/schema-altered.json
             apistar docs --path docs/schema-altered.json --format openapi --theme swaggerui --output-dir docs/api-docs
+      - persist_to_workspace:
+          root: docs
+          paths: api-docs
+      - store_artifacts:
+          name: Upload API docs to artifacts
+          path: docs/api-docs
+          destination: api-docs
       - store_artifacts:
           name: Upload htmlcov to artifacts
           path: htmlcov
@@ -57,12 +67,29 @@ jobs:
           name: Upload logs to artifacts
           path: dev/logs
           destination: logs
-      - store_artifacts:
-          name: Upload API docs to artifacts
-          path: docs/api-docs
-          destination: api-docs
-
+  docs-deploy:
+    docker:
+    - image: node:8.10.0
+    steps:
+      - checkout
+      - attach_workspace:
+          at: docs
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install -g --silent gh-pages@2.0.1
+            git config user.email "ci-build@deflect.ca"
+            git config user.name "ci-build"
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --message "[skip ci] Update docs" --dist docs/api-docs
 workflows:
   main:
     jobs:
       - build-and-test
+      - docs-deploy:
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only: master
