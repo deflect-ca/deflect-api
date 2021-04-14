@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 class WebsiteList(mixins.ListModelMixin,
                   generics.GenericAPIView):
-    """ /api/website/list """
+    """ List of all website: /api/website/list """
     queryset = Website.objects.all()
     serializer_class = WebsiteSerializer  # do not show options
     schema = CustomSchema(tags=['website'])
@@ -27,7 +27,7 @@ class WebsiteList(mixins.ListModelMixin,
 
 class WebsiteDetail(mixins.RetrieveModelMixin,
                     generics.GenericAPIView):
-    """ /api/website/<int:pk> """
+    """ Detail config of a website: /api/website/<int:pk> """
     queryset = Website.objects.all()
     serializer_class = WebsiteDetailSerializer  # show options
     schema = CustomSchema(tags=['website'])
@@ -37,7 +37,7 @@ class WebsiteDetail(mixins.RetrieveModelMixin,
 
 class WebsiteCreate(mixins.CreateModelMixin,
                     generics.GenericAPIView):
-    """ /api/website/create """
+    """ Create a new website: /api/website/create """
     queryset = Website.objects.all()
     serializer_class = WebsiteCreateSerializer
     schema = CustomSchema(tags=['website'])
@@ -47,7 +47,7 @@ class WebsiteCreate(mixins.CreateModelMixin,
 
 class WebsiteModify(mixins.UpdateModelMixin,
                     generics.GenericAPIView):
-    """ /api/website/<int:pk>/modify """
+    """ Modify an existing website: /api/website/<int:pk>/modify """
     queryset = Website.objects.all()
     serializer_class = WebsiteUpdateSerializer
     schema = CustomSchema(tags=['website'])
@@ -57,7 +57,7 @@ class WebsiteModify(mixins.UpdateModelMixin,
 
 class WebsiteDelete(mixins.DestroyModelMixin,
                     generics.GenericAPIView):
-    """ /api/website/<int:pk>/delete """
+    """ Delete an existing website: /api/website/<int:pk>/delete """
     queryset = Website.objects.all()
     serializer_class = WebsiteSerializer
     schema = CustomSchema(tags=['website'])
@@ -66,7 +66,7 @@ class WebsiteDelete(mixins.DestroyModelMixin,
 
 class WebsiteListOptions(mixins.ListModelMixin,
                          generics.GenericAPIView):
-    """ /api/website/<int:pk>/options """
+    """ List all options of a website: /api/website/<int:pk>/options """
     serializer_class = WebsiteOptionSerializer
     schema = CustomSchema(tags=['website_options'])
 
@@ -84,7 +84,7 @@ class WebsiteListOptions(mixins.ListModelMixin,
 class WebsiteOptionsDetail(mixins.RetrieveModelMixin,
                            mixins.DestroyModelMixin,
                            generics.GenericAPIView):
-    """ /api/website/<int:pk>/options/<str:name> """
+    """ List a option key/value of a website: /api/website/<int:pk>/options/<str:name> """
     serializer_class = WebsiteOptionSerializer
     lookup_field = 'name'
     schema = CustomSchema(tags=['website_options'])

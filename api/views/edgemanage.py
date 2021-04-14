@@ -17,7 +17,7 @@ class Edge(APIView):
     schema = CustomSchema(tags=['edgemanage'], load_api_yaml=True)
 
     def get(self, request):
-        """ List all edges currently managed by edgemanage """
+        """ List all edges managed by edgemanage """
         try:
             return Response(edge_query(request.GET['dnet']))
         except KeyError as err:
