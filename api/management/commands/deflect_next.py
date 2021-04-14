@@ -13,7 +13,6 @@ from deflect_next.orchestration import generate_bind_config
 from deflect_next.orchestration import decrypt_and_verify_cert_bundles
 from deflect_next.orchestration import generate_nginx_config
 from deflect_next.orchestration import generate_banjax_next_config
-import deflect_next.orchestration.conf as deflect_next_conf
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +67,11 @@ class Command(BaseCommand):
         with open(options['config'], 'r') as file_config:
             config = yaml.load(file_config.read(), Loader=yaml.FullLoader)
 
+        logger.info(f"controller_domain:\t{config['controller_domain']}")
+        logger.info(f"controller_ip:    \t{config['controller_ip']}")
+        logger.info(f"edge_ips:         \t{config['edge_ips']}")
+        logger.info(f"output_prefix:    \t{config['output_prefix']}")
+
         old_sites_yml = {}
         with open(options['sites'], "r") as file_sites:
             old_sites_yml = yaml.load(file_sites.read(), Loader=yaml.FullLoader)
@@ -76,31 +80,21 @@ class Command(BaseCommand):
 
         time = datetime.fromtimestamp(float(old_sites_yml["timestamp"]) / 1000.0)
         formatted_time = time.strftime("%Y-%m-%d_%H:%M:%S")
-        output_dir = f"{options['output']}/{formatted_time}"
-
-        # Load the config and output_prefix into memory
-        deflect_next_conf.init(config, output_dir, False)
-
-        if not os.path.isdir(output_dir):
-            logger.info(f"mkdir {output_dir}")
-            os.mkdir(output_dir)
 
         logger.info('old_to_new_site_dict')
-        new_client_sites = old_to_new_site_dict.main(
-            old_sites, old_sites_timestamp)
+        new_client_sites = old_to_new_site_dict.main(old_sites, old_sites_timestamp, config)
 
         system_sites = {}
         with open(options['sys'], "r") as f:
             system_sites = yaml.load(f.read(), Loader=yaml.FullLoader)
 
         all_sites = {'client': new_client_sites, 'system': system_sites}
-        logger.debug(json.dumps(all_sites, indent=2))
 
         logger.info('generate_bind_config')
         generate_bind_config.main(config, all_sites, formatted_time)
 
         logger.info('decrypt_and_verify_cert_bundles')
-        decrypt_and_verify_cert_bundles.main(all_sites, formatted_time)
+        decrypt_and_verify_cert_bundles.main(all_sites, formatted_time, config)
 
         logger.info('generate_nginx_config')
         generate_nginx_config.main(all_sites, config, formatted_time)
