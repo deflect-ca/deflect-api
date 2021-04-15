@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles'
+    'django.contrib.staticfiles',
+    'django_celery_results'
 ]
 
 MIDDLEWARE = [
@@ -241,3 +242,4 @@ GSC_IGNORE_APPROVAL = env('GSC_IGNORE_APPROVAL', default=True)
 
 # Celery
 CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_RESULT_BACKEND = 'django-db'
