@@ -67,6 +67,18 @@ Start the dev server with
 
     python manage.py runserver
 
+### Celery (dev)
+
+Run a celery worker with RabbitMQ for development
+
+    python manage.py migrate django_celery_results  # first time
+    rabbitmq-server
+    celery -A core worker -l info
+
+or change broker settings in `settings.py`
+
+    CELERY_BROKER_URL = 'amqp://localhost'
+
 ### Edgemanage
 
 After executing `python setup.py install` for edgemanage, there will be 3 binary installed
