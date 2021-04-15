@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from .views import edgemanage, website
+from .views import edgemanage, website, integration
 
 urlpatterns = [
 
@@ -52,6 +52,10 @@ urlpatterns = [
     #   dnet/create
     #   dnet/modify
     #   dnet/delete
+
+    # integration
+    path('integration/gen_site_config',
+        integration.GenSiteConfig.as_view(), name='api_gen_site_config')
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
