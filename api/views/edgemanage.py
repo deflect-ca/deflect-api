@@ -9,6 +9,8 @@ from django.conf import settings
 
 from api.modules.util import CustomSchema
 from api.modules.edgemanage import edge_query, edge_conf, dnet_query
+from core.tasks import deflect_next_task
+
 
 logger = logging.getLogger(__name__)
 
@@ -57,3 +59,12 @@ class EdgeConf(APIView):
         except Exception as err:
             logger.error(err)
             return Response({"error": str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class EdgeCreate(APIView):
+    schema = CustomSchema(tags=['edgemanage'], load_api_yaml=True)
+
+    def post(self, request):
+        """ Invoke deflect_next task in celery """
+        async_id = deflect_next_task.delay()
+        return Response({"async_id": str(async_id)})

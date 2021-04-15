@@ -40,8 +40,8 @@ urlpatterns = [
         edgemanage.Edge.as_view(), name='api_edge_list'),
     path('edge/config',
         edgemanage.EdgeConf.as_view(), name='api_edge_config'),
-    # TODO:
-    #   edge/create
+    path('edge/create',
+        edgemanage.EdgeCreate.as_view(), name='api_edge_create'),
     #   edge/modify
     #   edge/delete
 
