@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_save
+from api.modules.util import model_post_save
 
 
 class Record(models.Model):
@@ -46,3 +48,10 @@ class Record(models.Model):
     def __str__(self):
         return 'Record id={}, type={}, hostname={}'.format(
             self.id, self.type, self.hostname)
+
+    @staticmethod
+    def post_save(**kwargs):
+        model_post_save(**kwargs)
+
+
+post_save.connect(Record.post_save, sender=Record)

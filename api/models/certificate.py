@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_save
+from api.modules.util import model_post_save
 
 
 class Certificate(models.Model):
@@ -37,3 +39,10 @@ class Certificate(models.Model):
 
     def __str__(self):
         return 'Certificate #{} {}'.format(self.id, self.hostnames.split(", "))
+
+    @staticmethod
+    def post_save(**kwargs):
+        model_post_save(**kwargs)
+
+
+post_save.connect(Certificate.post_save, sender=Certificate)

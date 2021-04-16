@@ -2,6 +2,9 @@ from django.db import models
 from django_mysql.models import Model as DjangoMySQLModel
 from marshmallow import fields, Schema, validate
 
+from django.db.models.signals import post_save
+from api.modules.util import model_post_save
+
 
 class WebsiteOption(DjangoMySQLModel):
     """
@@ -52,6 +55,10 @@ class WebsiteOption(DjangoMySQLModel):
         """
         schema = OptionSchema()
         return schema.dump({self.name: self.data})
+
+    @staticmethod
+    def post_save(**kwargs):
+        model_post_save(**kwargs)
 
 
 class OptionSchema(Schema):
@@ -133,3 +140,6 @@ class BanjaxRegexBannersSchema(Schema):
     banners = fields.Nested(BanjaxRegexBannerSchema,
                             validate=validate.Length(min=1),
                             required=True, many=True)
+
+
+post_save.connect(WebsiteOption.post_save, sender=WebsiteOption)
