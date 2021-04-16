@@ -1,9 +1,14 @@
+import logging
 import yaml
 import string
 import os
 import warnings
 
+from django.conf import settings
 from rest_framework.schemas.openapi import AutoSchema
+from core.tasks import gen_site_config_task
+
+logger = logging.getLogger(__name__)
 
 
 class CustomSchema(AutoSchema):
@@ -27,3 +32,11 @@ class CustomSchema(AutoSchema):
         if self.op_id in self.api_yaml:
             return self.api_yaml[self.op_id]['responses']
         return super().get_responses(path, method)
+
+
+def model_post_save(**kwargs):
+    logger.debug(kwargs)
+    if settings.GSC_TRIGGER_UPON_DB_CHANGE:
+        gen_site_config_task.delay()
+    else:
+        logger.info('GSC_TRIGGER_UPON_DB_CHANGE = False')

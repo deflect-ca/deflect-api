@@ -6,6 +6,8 @@ import string
 import random
 
 from django.db import models
+from django.db.models.signals import post_save
+from api.modules.util import model_post_save
 from .website_option import WebsiteOption
 
 logger = logging.getLogger(__name__)
@@ -125,3 +127,10 @@ class Website(models.Model):
 
     def __str__(self):
         return 'Website #{} {}'.format(self.id, self.url)
+
+    @staticmethod
+    def post_save(**kwargs):
+        model_post_save(**kwargs)
+
+
+post_save.connect(Website.post_save, sender=Website)
