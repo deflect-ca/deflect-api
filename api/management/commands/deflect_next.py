@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import os
+import time
 import logging
 import yaml
 import json
@@ -54,14 +55,19 @@ class Command(BaseCommand):
             help='SSH key file path'
         )
 
-
     def load_ssh_key(self, key_path):
         ssh_agent_setup.setup()
         ssh_agent_setup.addKey(os.path.expanduser(key_path))
 
+    def measure_exec_time(self):
+        self.start_time = time.time()
+
+    def print_exec_time(self):
+        logger.info("--- %s seconds ---" % (time.time() - self.start_time))
 
     def handle(self, *args, **options):
 
+        self.measure_exec_time()
         config = {}
         with open(options['config'], 'r') as file_config:
             config = yaml.load(file_config.read(), Loader=yaml.FullLoader)
@@ -112,3 +118,5 @@ class Command(BaseCommand):
             install_delta_config.edges(config, all_sites, formatted_time, formatted_time)
         else:
             logger.info('Mode should be set to: full, edge')
+
+        self.print_exec_time()
