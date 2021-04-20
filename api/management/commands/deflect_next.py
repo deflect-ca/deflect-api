@@ -45,9 +45,8 @@ class Command(BaseCommand):
             help='Default is staging mode'
         )
         parser.add_argument(
-            '-g', '--genonly',
-            default=False,
-            action='store_true',
+            '-m', '--mode',
+            default='full',
             help='Default is not gen only mode'
         )
         parser.add_argument(
@@ -102,10 +101,14 @@ class Command(BaseCommand):
         logger.info('generate_banjax_next_config')
         generate_banjax_next_config.main(config, all_sites, formatted_time)
 
-        if not options['genonly']:
-            logger.info(f"load ssh key from: {options['key']}")
-            self.load_ssh_key(options['key'])
+        logger.info(f"load ssh key from: {options['key']}")
+        self.load_ssh_key(options['key'])
+
+        if options['mode'] == 'full':
             logger.info('install_delta_config')
             install_delta_config.main(config, all_sites, formatted_time, formatted_time)
+        elif options['mode'] == 'edge':
+            logger.info('edge update only')
+            install_delta_config.edges(config, all_sites, formatted_time, formatted_time)
         else:
-            logger.info('genonly presented, ending successfully')
+            logger.info('Mode should be set to: full, edge')
