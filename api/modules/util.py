@@ -35,8 +35,30 @@ class CustomSchema(AutoSchema):
 
 
 def model_post_save(**kwargs):
+    """
+    Sample kwargs: {
+        'signal': <django.db.models.signals.ModelSignal object at 0x109ef34a8>,
+        'sender': <class 'api.models.website.Website'>,
+        'instance': <Website #39 example.com>,
+        'created': True,
+        'update_fields': None,
+        'raw': False,
+        'using': 'default'
+    }
+    """
     logger.debug(kwargs)
-    if settings.GSC_TRIGGER_UPON_DB_CHANGE:
-        gen_site_config_task.delay()
-    else:
+
+    if not settings.GSC_TRIGGER_UPON_DB_CHANGE:
         logger.info('GSC_TRIGGER_UPON_DB_CHANGE = False')
+        return
+
+    # Call deflect_next in edge update mode by default
+    next_mode = 'edge'
+
+    # Call deflect_next in full mode when new site is created
+    if kwargs.get('created') and str(kwargs.get('sender')) == "<class 'api.models.website.Website'>":
+        logger.debug("New website created, trigger next in mode = full")
+        next_mode = 'full'
+
+    async_id = gen_site_config_task.delay(next_mode)
+    logger.info(f"Trigger task ID: {async_id}, next_mode: {next_mode}")
