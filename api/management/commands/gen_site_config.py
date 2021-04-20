@@ -21,6 +21,7 @@ from django.core.management.base import BaseCommand
 from six import reraise as raise_
 
 from api.models import Website, YamlDiff  # pylint: disable=no-name-in-module,import-error
+from core.tasks import deflect_next_task
 
 
 logger = logging.getLogger(__name__)
@@ -53,6 +54,16 @@ class Command(BaseCommand):
             action='store_true',
             help='Unit test mode, always save YAML Diff and output site.yml'
         )
+        parser.add_argument(
+            '-n', '--next',
+            default=False,
+            help='Trigger deflect_next task after run'
+        )
+        parser.add_argument(
+            '-m', '--mode',
+            default='full',
+            help='deflect_next --mode options'
+        )
 
     def handle(self, *args, **options):
         """
@@ -77,6 +88,10 @@ class Command(BaseCommand):
         for partition, sites in partition_to_sites.items():
             logger.info("number of sites in partition '%s': %s", partition, len(sites))
             self.write_config_if_changed(sites, os.path.join(output_location, partition), debug)
+
+        # chain reaction
+        if options['next']:
+            deflect_next_task.delay(options['mode'])
 
 
     def generate_site_file(self, blacklist_path, debug):

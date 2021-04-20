@@ -4,8 +4,12 @@ from django.conf import settings
 
 
 @shared_task
-def gen_site_config_task():
-    call_command('gen_site_config')
+def gen_site_config_task(mode):
+    call_command(
+        'gen_site_config',
+        next=True,
+        mode=mode
+    )
 
 
 @shared_task
