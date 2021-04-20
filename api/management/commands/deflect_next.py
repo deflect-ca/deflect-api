@@ -4,7 +4,6 @@ import os
 import time
 import logging
 import yaml
-import json
 import ssh_agent_setup
 
 from django.core.management.base import BaseCommand
@@ -83,8 +82,8 @@ class Command(BaseCommand):
             old_sites_timestamp = old_sites_yml["timestamp"]
             old_sites = old_sites_yml["remap"]
 
-        time = datetime.fromtimestamp(float(old_sites_yml["timestamp"]) / 1000.0)
-        formatted_time = time.strftime("%Y-%m-%d_%H:%M:%S")
+        timestamp = datetime.fromtimestamp(float(old_sites_yml["timestamp"]) / 1000.0)
+        formatted_time = timestamp.strftime("%Y-%m-%d_%H:%M:%S")
 
         logger.info('old_to_new_site_dict')
         new_client_sites = old_to_new_site_dict.main(old_sites, old_sites_timestamp, config)
