@@ -36,22 +36,12 @@ urlpatterns = [
         website.WebsiteDeleteRecord.as_view(), name='api_website_delete_record'),
 
     # edgemanage
-    path('edge/list',
+    path('edgemanage/list',
         edgemanage.Edge.as_view(), name='api_edge_list'),
-    path('edge/config',
+    path('edgemanage/config',
         edgemanage.EdgeConf.as_view(), name='api_edge_config'),
-    path('edge/create',
-        edgemanage.EdgeCreate.as_view(), name='api_edge_create'),
-    #   edge/modify
-    #   edge/delete
-
-    # dnet
-    path('dnet/list',
+    path('edgemanage/dnet',
         edgemanage.Dnet.as_view(), name='api_dnet_list'),
-    # TODO:
-    #   dnet/create
-    #   dnet/modify
-    #   dnet/delete
 
     # integration
     path('integration/gen_site_config',

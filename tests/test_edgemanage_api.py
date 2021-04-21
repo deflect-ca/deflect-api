@@ -31,7 +31,7 @@ class EdgemanageAPITestCase(TestCase):
         self.assertIn('token', response.json())
 
     def test_edge_query(self):
-        response = self.client.get('/api/edge/list', {
+        response = self.client.get('/api/edgemanage/list', {
             'dnet': settings.EDGEMANAGE_DNET
         })
 
@@ -39,13 +39,13 @@ class EdgemanageAPITestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_dnet_query(self):
-        response = self.client.get('/api/dnet/list')
+        response = self.client.get('/api/edgemanage/dnet')
 
         # Check that the response is 200 OK.
         self.assertEqual(response.status_code, 200)
 
     def test_edge_conf(self):
-        response = self.client.put('/api/edge/config', {
+        response = self.client.put('/api/edgemanage/config', {
             'dnet': settings.EDGEMANAGE_DNET,
             'edge': settings.EDGEMANAGE_TEST_EDGE,
             'mode': 'unavailable',

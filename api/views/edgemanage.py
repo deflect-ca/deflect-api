@@ -31,7 +31,7 @@ class Edge(APIView):
 
 
 class Dnet(APIView):
-    schema = CustomSchema(tags=['dnet'], load_api_yaml=True)
+    schema = CustomSchema(tags=['edgemanage'], load_api_yaml=True)
 
     def get(self, request):
         """ List all dnets managed by edgemanage """
@@ -59,12 +59,3 @@ class EdgeConf(APIView):
         except Exception as err:
             logger.error(err)
             return Response({"error": str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-class EdgeCreate(APIView):
-    schema = CustomSchema(tags=['edgemanage'], load_api_yaml=True)
-
-    def post(self, request):
-        """ Invoke deflect_next task in celery """
-        async_id = deflect_next_task.delay()
-        return Response({"async_id": str(async_id)})
