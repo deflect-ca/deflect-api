@@ -20,7 +20,7 @@ class CustomSchema(AutoSchema):
         self.api_yaml = {}
         if load_api_yaml:
             current_path = os.path.dirname(os.path.realpath(__file__))
-            with open(f"{current_path}/../../docs/api.yml", 'r') as yml_file:
+            with open(f"{current_path}/../../docs/api-descriptions.yml", 'r') as yml_file:
                 self.api_yaml = yaml.load(yml_file, Loader=yaml.FullLoader)
         super().__init__(tags=tags)
 
