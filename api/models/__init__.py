@@ -7,3 +7,4 @@ from .record import Record
 from .certificate import Certificate
 from .yaml_diff import YamlDiff
 from .dnet import Dnet
+from .edge import Edge

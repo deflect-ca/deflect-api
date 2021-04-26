@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from .views import edgemanage, website, integration, dnet
+from .views import edgemanage, website, integration, dnet, edge
 
 urlpatterns = [
 
@@ -48,6 +48,12 @@ urlpatterns = [
         dnet.DnetList.as_view(), name='api_dnet_list'),
     path('dnet/<int:pk>',
         dnet.DnetDetail.as_view(), name='api_dnet_detial'),
+
+    # edge
+    path('edge/',
+        edge.EdgeList.as_view(), name='api_edge_list'),
+    path('edge/<int:pk>',
+        edge.EdgeDetail.as_view(), name='api_edge_detial'),
 
     # integration
     path('integration/gen_site_config',
