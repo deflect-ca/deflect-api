@@ -6,4 +6,4 @@ class DnetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Dnet
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'created_at', 'updated_at']
