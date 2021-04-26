@@ -7,8 +7,10 @@ import logging
 from django.conf import settings
 from edgemanage3.edgemanage.adapter import EdgemanageAdapter
 from edgemanage3.edgemanage import EdgeState
+from api.models import Edge
 
 logger = logging.getLogger(__name__)
+
 
 def edge_query(dnet=None):
     """
@@ -132,9 +134,32 @@ def dnet_query():
     """
     try:
         edgemanage_adapter = EdgemanageAdapter(
-            settings.EDGEMANAGE_CONFIG, None)
+            settings.EDGEMANAGE_CONFIG)
         dnets = edgemanage_adapter.dnet_query()
     except FileNotFoundError:
         raise FileNotFoundError('dnet_query: edgemanage error')
 
     return dnets
+
+
+def update_dnet_edges():
+    """
+    Sync deflect-core dnet/edges from DB to edgemanage
+    """
+    mapping = {}
+    edges = Edge.objects.only('dnet')  # lazyload dnets
+    for edge in edges:
+        dnet = edge.dnet.name
+        if dnet in mapping:
+            mapping[dnet].append(edge.hostname)
+        else:
+            mapping[dnet] = [edge.hostname]
+
+    print('mapping', mapping)
+
+    try:
+        edgemanage_adapter = EdgemanageAdapter(
+            settings.EDGEMANAGE_CONFIG)
+        edgemanage_adapter.dump_dnet_and_edges(mapping)
+    except Exception as err:
+        logger.error(err)
