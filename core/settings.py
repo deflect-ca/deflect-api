@@ -250,3 +250,4 @@ NEXT_OUTPUT_PREFIX = env('NEXT_OUTPUT_PREFIX', default='dev/deflect_next/output'
 NEXT_CONFIG = env('NEXT_CONFIG', default='dev/deflect_next/input/config.yml')
 NEXT_SYS_SITES = env('NEXT_SYS_SITES', default='dev/deflect_next/input/system-sites.yml')
 NEXT_SSH_KEY = env('NEXT_SSH_KEY', default='~/.ssh/id_rsa')
+NEXT_TRIGGER_UPON_DB_CHANGE = env('NEXT_TRIGGER_UPON_DB_CHANGE', default=False)

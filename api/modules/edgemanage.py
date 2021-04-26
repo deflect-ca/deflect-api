@@ -7,7 +7,6 @@ import logging
 from django.conf import settings
 from edgemanage3.edgemanage.adapter import EdgemanageAdapter
 from edgemanage3.edgemanage import EdgeState
-from api.models import Edge
 
 logger = logging.getLogger(__name__)
 
@@ -142,20 +141,11 @@ def dnet_query():
     return dnets
 
 
-def update_dnet_edges():
+def update_dnet_edges(mapping):
     """
     Sync deflect-core dnet/edges from DB to edgemanage
     """
-    mapping = {}
-    edges = Edge.objects.only('dnet')  # lazyload dnets
-    for edge in edges:
-        dnet = edge.dnet.name
-        if dnet in mapping:
-            mapping[dnet].append(edge.hostname)
-        else:
-            mapping[dnet] = [edge.hostname]
-
-    print('mapping', mapping)
+    logger.info('mapping', mapping)
 
     try:
         edgemanage_adapter = EdgemanageAdapter(
