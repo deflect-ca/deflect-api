@@ -2,7 +2,7 @@ from django.db import models
 from django_mysql.models import Model as DjangoMySQLModel
 from marshmallow import fields, Schema, validate
 
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from api.modules.util import model_post_save
 
 
@@ -57,7 +57,7 @@ class WebsiteOption(DjangoMySQLModel):
         return schema.dump({self.name: self.data})
 
     @staticmethod
-    def post_save(**kwargs):
+    def post_change(**kwargs):
         model_post_save(**kwargs)
 
 
@@ -142,4 +142,5 @@ class BanjaxRegexBannersSchema(Schema):
                             required=True, many=True)
 
 
-post_save.connect(WebsiteOption.post_save, sender=WebsiteOption)
+post_save.connect(WebsiteOption.post_change, sender=WebsiteOption)
+post_delete.connect(WebsiteOption.post_change, sender=WebsiteOption)

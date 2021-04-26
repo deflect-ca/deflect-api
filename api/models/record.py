@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from api.modules.util import model_post_save
 
 
@@ -50,8 +50,9 @@ class Record(models.Model):
             self.id, self.type, self.hostname)
 
     @staticmethod
-    def post_save(**kwargs):
+    def post_change(**kwargs):
         model_post_save(**kwargs)
 
 
-post_save.connect(Record.post_save, sender=Record)
+post_save.connect(Record.post_change, sender=Record)
+post_delete.connect(Record.post_change, sender=Record)

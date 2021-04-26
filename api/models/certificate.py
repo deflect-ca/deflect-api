@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from api.modules.util import model_post_save
 
 
@@ -41,8 +41,9 @@ class Certificate(models.Model):
         return 'Certificate #{} {}'.format(self.id, self.hostnames.split(", "))
 
     @staticmethod
-    def post_save(**kwargs):
+    def post_change(**kwargs):
         model_post_save(**kwargs)
 
 
-post_save.connect(Certificate.post_save, sender=Certificate)
+post_save.connect(Certificate.post_change, sender=Certificate)
+post_delete.connect(Certificate.post_change, sender=Certificate)

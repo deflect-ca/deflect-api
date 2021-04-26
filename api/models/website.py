@@ -6,7 +6,7 @@ import string
 import random
 
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from api.modules.util import model_post_save
 from .website_option import WebsiteOption
 
@@ -129,8 +129,9 @@ class Website(models.Model):
         return 'Website #{} {}'.format(self.id, self.url)
 
     @staticmethod
-    def post_save(**kwargs):
+    def post_change(**kwargs):
         model_post_save(**kwargs)
 
 
-post_save.connect(Website.post_save, sender=Website)
+post_save.connect(Website.post_change, sender=Website)
+post_delete.connect(Website.post_change, sender=Website)
