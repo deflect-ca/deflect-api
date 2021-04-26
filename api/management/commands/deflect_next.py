@@ -7,6 +7,8 @@ import yaml
 import ssh_agent_setup
 
 from django.core.management.base import BaseCommand
+from api.models import Edge
+
 from deflect_next.orchestration import old_to_new_site_dict
 from deflect_next.orchestration import install_delta_config
 from deflect_next.orchestration import generate_bind_config
@@ -64,12 +66,27 @@ class Command(BaseCommand):
     def print_exec_time(self):
         logger.info("--- %s seconds ---" % (time.time() - self.start_time))
 
+    def get_edge_list(self):
+        edges = Edge.objects.all()
+        edge_list = []
+
+        for edge in edges:
+            edge_list.append(edge.ip)
+
+        return edge_list
+
     def handle(self, *args, **options):
 
         self.measure_exec_time()
         config = {}
         with open(options['config'], 'r') as file_config:
             config = yaml.load(file_config.read(), Loader=yaml.FullLoader)
+
+        db_edge_list = self.get_edge_list()
+        if len(db_edge_list) > 0:
+            logger.info(f"config edge_ips:  \t{config['edge_ips']}")
+            config['edge_ips'] = db_edge_list
+            logger.info(f"replaced edge_ips:\t{config['edge_ips']}")
 
         logger.info(f"controller_domain:\t{config['controller_domain']}")
         logger.info(f"controller_ip:    \t{config['controller_ip']}")
