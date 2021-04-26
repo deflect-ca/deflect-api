@@ -237,12 +237,12 @@ GSC_PARTITIONS = json.loads(env('GSC_PARTITIONS'))
 GSC_BLACKLIST_FILE = env('GSC_BLACKLIST_FILE', default='blacklist.txt')
 GSC_DEFAULT_CACHE_TIME = env('GSC_DEFAULT_CACHE_TIME', default=10)
 GSC_DEFAULT_NETWORK = env('GSC_DEFAULT_NETWORK', default='dnet1')
-GSC_REMAP_PURGE_DEFAULT_SECRET = "some-dummy-secret"
-GSC_IGNORE_APPROVAL = env('GSC_IGNORE_APPROVAL', default=True)
+GSC_REMAP_PURGE_DEFAULT_SECRET = env('GSC_REMAP_PURGE_DEFAULT_SECRET', default='some-dummy-secret')
+GSC_IGNORE_APPROVAL = env('GSC_IGNORE_APPROVAL', default=True)  # deflect-web legacy
 GSC_TRIGGER_UPON_DB_CHANGE = env('GSC_TRIGGER_UPON_DB_CHANGE', default=False)
 
 # Celery
-CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='amqp://localhost')
 CELERY_RESULT_BACKEND = 'django-db'
 
 # Deflect Next
