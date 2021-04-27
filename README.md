@@ -65,7 +65,7 @@ Footnotes:
 
 ## Provisioning and Deployment
 
-Please refer Please refer to [INSTALL.md](docs/INSTALL.md)
+Please refer to [INSTALL.md](docs/INSTALL.md)
 
 ## Usage
 
