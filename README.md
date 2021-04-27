@@ -45,9 +45,9 @@ Deflect-core has several integration mechanism in place, this table is a breif o
 
 verb    | subject       | 1st reaction         | 2nd reaction
 --------| --------------|----------------------|-------------------------
-CD[^1]  | website[^3]   | `gen_site_config`    | `deflect_next(mode=full)`
-U[^2]   | website       | `gen_site_config`    | `deflect_next(mode=edge)`
-CU      | edge          | edgemanage update[^4]| `deflect_next(mode=full)`
+CD[1]   | website[3]    | `gen_site_config`    | `deflect_next(mode=full)`
+U[2]    | website       | `gen_site_config`    | `deflect_next(mode=edge)`
+CU      | edge          | edgemanage update[4] | `deflect_next(mode=full)`
 D       | edge          | edgemanage update    | `docker prune`
 C       | dnet          | edgemanage update    |
 D       | dnet          | edgemanage update    |
@@ -56,10 +56,12 @@ In this table, subject could represent HTTP API endpoint, or operation via djang
 
 Most long running task are triggered by celery worker, such as `gen_site_config` and `deflect_next`.
 
-[^1]: CD: Create(C) and Delete(D)
-[^2]: U: Update(U)
-[^3]: website: Websites, Website Options, DNS records and certificates
-[^4]: edgemanage update: files under `edgelist_dir` is updated according to latest database changes of dnet and edges
+Footnotes:
+
+1. CD: Create(C) and Delete(D)
+2. U: Update(U)
+3. website: Websites, Website Options, DNS records and certificates
+4. edgemanage update: files under `edgelist_dir` is updated according to latest database changes of dnet and edges
 
 ## Provisioning and Deployment
 
