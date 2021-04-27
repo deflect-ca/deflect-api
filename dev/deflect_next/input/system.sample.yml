@@ -1,0 +1,68 @@
+doh.next4.patricks.tw:
+  allow_http_delete_push: false
+  cache_exceptions: []
+  challenge_everyone_captcha: false
+  challenge_everyone_sha_inv: false
+  default_cache_time_minutes: 10
+  disable_logging: false
+  dnet: dnet1
+  dns_records: {}
+  http_request_does: http_proxy_pass
+  https_request_does: https_proxy_pass
+  letsencrypt: true
+  origin_http_port: 8085
+  origin_https_port: 444
+  origin_ip: 138.68.234.44
+  password_protected_paths: []
+  password_protected_paths_password: 2Vv+lTkNhGPaK9yTDsCuHTye9Pnl7K98gqGRbKC5osg=
+  public_domain: doh.next4.patricks.tw
+  rate_limited_regexes: []
+  server_names:
+  - doh.next4.patricks.tw
+  - www.doh.next4.patricks.tw
+  uploaded_cert_bundle_name: null
+kibana.next4.patricks.tw:
+  allow_http_delete_push: false
+  cache_exceptions: []
+  challenge_everyone_captcha: false
+  challenge_everyone_sha_inv: false
+  default_cache_time_minutes: 10
+  disable_logging: false
+  dnet: dnet1
+  dns_records: {}
+  http_request_does: http_proxy_pass
+  https_request_does: https_proxy_pass
+  letsencrypt: true
+  origin_http_port: 5601
+  origin_https_port: 444
+  origin_ip: 138.68.234.44
+  password_protected_paths: []
+  password_protected_paths_password: 2Vv+lTkNhGPaK9yTDsCuHTye9Pnl7K98gqGRbKC5osg=
+  public_domain: kibana.next4.patricks.tw
+  rate_limited_regexes: []
+  server_names:
+  - kibana.next4.patricks.tw
+  - www.kibana.next4.patricks.tw
+  uploaded_cert_bundle_name: null
+banjax-next.next4.patricks.tw:
+  allow_http_delete_push: false
+  cache_exceptions: []
+  challenge_everyone_captcha: false
+  challenge_everyone_sha_inv: false
+  default_cache_time_minutes: 10
+  disable_logging: false
+  dnet: dnet1
+  dns_records: {}
+  http_request_does: http_proxy_pass
+  https_request_does: http_proxy_pass
+  letsencrypt: true
+  origin_http_port: 8081
+  origin_https_port: 8081
+  origin_ip: 127.0.0.1
+  password_protected_paths: []
+  password_protected_paths_password: 2Vv+lTkNhGPaK9yTDsCuHTye9Pnl7K98gqGRbKC5osg=
+  public_domain: banjax-next.next4.patricks.tw
+  rate_limited_regexes: []
+  server_names:
+  - banjax-next.next4.patricks.tw
+  uploaded_cert_bundle_name: null

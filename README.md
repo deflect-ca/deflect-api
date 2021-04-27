@@ -39,81 +39,47 @@ This project serves as the core of Deflect, several componenet is integrated wit
     - provision new deflect-next edge
     - provision new deflect-next controller
 
+## Integration
+
+Deflect-core has several integration mechanism in place, this table is a breif overview of how everything work together:
+
+verb    | subject       | 1st reaction         | 2nd reaction
+--------| --------------|----------------------|-------------------------
+CD[^1]  | website[^3]   | `gen_site_config`    | `deflect_next(mode=full)`
+U[^2]   | website       | `gen_site_config`    | `deflect_next(mode=edge)`
+CU      | edge          | edgemanage update[^4]| `deflect_next(mode=full)`
+D       | edge          | edgemanage update    | `docker prune`
+C       | dnet          | edgemanage update    |
+D       | dnet          | edgemanage update    |
+
+In this table, subject could represent HTTP API endpoint, or operation via django admin. Once the action of the verb, for example, C (create), was committed, the 1st reaction will be trigger right away. Depending on the category, the second reaction will be triggered after the first reaction was complete.
+
+Most long running task are triggered by celery worker, such as `gen_site_config` and `deflect_next`.
+
+[^1]: CD: Create(C) and Delete(D)
+[^2]: U: Update(U)
+[^3]: website: Websites, Website Options, DNS records and certificates
+[^4]: edgemanage update: files under `edgelist_dir` is updated according to latest database changes of dnet and edges
 
 ## Provisioning and Deployment
 
-### System requirements
+Please refer Please refer to [docs/INSTALL.md](docs/install.md)
 
-1. Python 3.6.10
-2. Django 3.1
-3. Django REST framework 3.11.1
-4. MySQL 5.7 or above (JSON support)
+## Usage
 
-### Deployment
+### API Documentation
 
-Deflect core could be installed in a python virtual env
+Please refer to [HTTP API Documentation](https://equalitie.github.io/deflect-core/)
 
-    python -m venv venv
-    source venv/bin/activate
+### Django command line
 
-Two git submodule, including `edgemanage` and `deflect-next` should be init and install
-
-    git submodule update --init
-    cd edgemanage3 && python setup.py install
-    cd deflect_next/orchestration && pip install -r requirements.txt
-
-After that, we could setup deflect-core, edit `.env` and setup database
-
-    pip install -r requirements.txt
-    cp core/.env.example core/.env
-    python manage.py migrate
-    python manage.py createsuperuser --email admin@example.com --username admin
-
-Start the dev server with
-
-    python manage.py runserver
-
-### Celery (dev)
-
-Run a celery worker with RabbitMQ for development
-
-    python manage.py migrate django_celery_results  # first time
-    rabbitmq-server
-    celery -A core worker -l info
-
-or change broker settings in `settings.py`
-
-    CELERY_BROKER_URL = 'amqp://localhost'
-
-### Edgemanage
-
-After executing `python setup.py install` for edgemanage, there will be 3 binary installed
-
-- edge_manage
-- edge_query
-- edge_conf
-
-Directly executing these command should work as usual, but **an edgemanage config yaml is required** before running such command
-
-1. `cp dev/edgemanage/edgemanage.example.yaml dev/edgemanage/edgemanage.yaml`
-2. Edit `edgemanage.yaml`, replace `<abs_path>` with absolute path of this project directory (without trailing `/`)
-3. Create `dev/edgemanage/edges/dev` and insert edges hostname, line by line
-
-Execute commands to ensure edgemanage is installed correctly
-
-    edge_manage --dnet dev --config dev/edgemanage/edgemanage.yaml -v
-    edge_conf --dnet dev --config dev/edgemanage/edgemanage.yaml --mode unavailable --comment "out" {edge_hostname}
-    edge_query --dnet dev --config dev/edgemanage/edgemanage.yaml -v
-
-## django-admin commands
-
-### deflect_next
+#### **deflect_next**
 
 This command calls `deflect-next` function to perform edge related operation from the command line.
 
-    python manage.py deflect_next --sites <path-to-site-yml> --output <path-to-dir> --config <path-to-config-yml> --key <ssh_private_key>
+    python manage.py deflect_next --sites <path-to-site-yml> -sys <path-to-system-yml> --config <path-to-config-yml> --key <ssh_private_key> --mode <edge|full>
 
-A [config.yml](dev/deflect_next/input/config.sample.yml) is required for this command. It defines the IP, domain name of the remote machine which your edge should be provisioned.
+[config.yml](dev/deflect_next/input/config.sample.yml) and [system.yml](dev/deflect_next/input/system.sample.yml) is required for this command. `config.yml` defines the IP, domain name of the remote machine which your edge should be provisioned. `system.yml` defines the required system sites. Please follow the `TODO` mark in both sample file to complete your setup.
 
 Copy the sample config to `config.yml` and replace the default `example.com` and `0.0.0.0` into valid domain and IP. A real domain with the following DNS settings is also required:
 
@@ -121,11 +87,17 @@ Copy the sample config to `config.yml` and replace the default `example.com` and
     ns2.next.example.com.	3600	IN	A	0.0.0.0
     next.example.com.	3600	IN	NS	ns1.next.example.com.
 
-For dev purpose, the output dir could be set to `dev/deflect_next/output`, `site.yml` could be generated by `gen_site_config` command.
+For dev purpose, the `output_prefix` in `config.yml` could be set to `dev/deflect_next/output`, `site.yml` could be generated by `gen_site_config` command.
 
-A SSH private key is required to connect to the remote host (defined in `config.yml` with key name `docker_host_ip`)
+A SSH private key is required to connect to the remote host (edges and controller)
 
-### gen_site_config
+Please be aware of the `--mode` option, which could be either `edge` or `full`.
+
+- edge mode: Only connect to all edges in the database to execute `install_nginx_config` and `install_banjax_next_config`. Typically for updating `site.yml`
+- full mode: Connects to both edges and controller to do a full install
+
+
+#### **gen_site_config**
 
 Generate `site.yml` file according to `Website`, `WebsiteOption` and `Record` model
 
@@ -143,28 +115,16 @@ Configuration should be set in `.env` before running this command:
 
 For dev purposes, `GSC_LOG_FILE` and `GSC_OUTPUT_LOCATION` could make use of the `dev/gen_sit_config` directory.
 
-### deep_diff
-
-This command executes `deepdiff` on two givne YAML file, and generates a difference in YAML format.
-
-    python manage.py deep_diff --file1 <path> --file2 <path> --output <path>
-
-`tests/test_gen_site_config.py` make use of this command to ensure generate `site.yml` is identical to `tests/sample/site.yml`.
-
-## Tests
+### Tests
 
 Invoke django test. Test includes API, Model and gen_site_config test, this will read your local `.env` file. For CircleCI tests, please refer to config in `.circleci`, test coverage report is also generated with automate test.
 
     python manage.py test
 
-## Django Admin
+### Django Admin
 
 Built-in admin interface can be accessed via [http://localhost:8000/admin](http://localhost:8000/admin)
 
-## REST framework GUI
+### REST framework GUI
 
 REST framework provides built-in GUI for API testing, auth is required by clicking "Log in" on the top right corner when accessed via [http://localhost:8000/api](http://localhost:8000/api)
-
-## API Documentation
-
-Please refer to [HTTP API Documentation](https://equalitie.github.io/deflect-core/)

@@ -37,16 +37,6 @@ class Command(BaseCommand):
             help='system sites.yml file'
         )
         parser.add_argument(
-            '-o', '--output',
-            help='output path for new sites.yml file (only dir)'
-        )
-        parser.add_argument(
-            '-p', '--prod',
-            default=False,
-            action='store_true',
-            help='Default is staging mode'
-        )
-        parser.add_argument(
             '-m', '--mode',
             default='full',
             help='Default is not gen only mode'
