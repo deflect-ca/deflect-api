@@ -32,7 +32,7 @@ class Edge(models.Model):
         logging.debug(kwargs)
         update_dnet_edges(Edge.get_mapping())
         if settings.NEXT_TRIGGER_UPON_DB_CHANGE:
-            deflect_next_task.delay(mode='edge')
+            deflect_next_task.delay(mode='full')
 
     @staticmethod
     def post_delete(**kwargs):
