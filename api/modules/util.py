@@ -34,7 +34,7 @@ class CustomSchema(AutoSchema):
         return super().get_responses(path, method)
 
 
-def model_post_save(**kwargs):
+def model_post_save(delete=False, **kwargs):
     """
     Sample kwargs: {
         'signal': <django.db.models.signals.ModelSignal object at 0x109ef34a8>,
@@ -58,6 +58,9 @@ def model_post_save(**kwargs):
     # Call deflect_next in full mode when new site is created
     if kwargs.get('created') and str(kwargs.get('sender')) == "<class 'api.models.website.Website'>":
         logger.debug("New website created, trigger next in mode = full")
+        next_mode = 'full'
+    elif delete:
+        logger.debug("Website deleted, trigger next in mode = full")
         next_mode = 'full'
 
     async_id = gen_site_config_task.delay(next_mode)

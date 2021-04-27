@@ -129,9 +129,13 @@ class Website(models.Model):
         return 'Website #{} {}'.format(self.id, self.url)
 
     @staticmethod
-    def post_change(**kwargs):
+    def post_save(**kwargs):
         model_post_save(**kwargs)
 
+    @staticmethod
+    def post_delete(**kwargs):
+        model_post_save(delete=True, **kwargs)
 
-post_save.connect(Website.post_change, sender=Website)
-post_delete.connect(Website.post_change, sender=Website)
+
+post_save.connect(Website.post_save, sender=Website)
+post_delete.connect(Website.post_delete, sender=Website)
