@@ -19,15 +19,19 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     volumes:
-      - ./deploy/docker/mysql:/var/lib/mysql
+      - mysql_volume:/var/lib/mysql
     environment:
       MYSQL_DATABASE: deflect-core
       MYSQL_ROOT_PASSWORD: password
   nginx:
     build: ./deploy/nginx
     ports:
-      - 1337:80
+      - 80:80
     volumes:
       - static_volume:/home/deflect-core/web/static
     depends_on:
       - web
+
+volumes:
+  static_volume:
+  mysql_volume:

@@ -16,8 +16,17 @@ git submodule update --init
 # Init config and set SECRET_KEY
 cp core/.env.example core/.env
 
-# Docker
-docker compose up --build
+# Docker start
+docker compose up -d --build
+
+# First time setup
+docker compose exec web python manage.py migrate --noinput
+docker compose exec web python manage.py collectstatic --no-input --clear
+docker compose exec web python manage.py createsuperuser --email admin@example.com --username admin
+
+# Docker stop
+docker compose down
+
 ```
 
 ### Test in docker
