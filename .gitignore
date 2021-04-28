@@ -142,5 +142,8 @@ dev/deflect_next/input/*.tar
 
 deploy/docker/mysql/*
 !deploy/docker/mysql/.gitkeep
-deploy/edgemanage/*
-!deploy/edgemanage/.gitkeep
+deploy/edgemanage/bind/*.zone
+deploy/edgemanage/health/*.edgestore
+deploy/edgemanage/state/*.state
+deploy/edgemanage/tmp/*.live
+deploy/gen_site_config/*/*.yml

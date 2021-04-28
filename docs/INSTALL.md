@@ -7,6 +7,19 @@
 3. Django REST framework 3.11.1
 4. MySQL 5.7 or above (JSON support)
 
+## Deployment
+
+```
+git clone git@github.com:equalitie/deflect-core.git
+git submodule update --init
+
+# Init config and set SECRET_KEY
+cp core/.env.example core/.env
+
+# Docker
+docker compose up --build
+```
+
 ## Development
 
 Deflect core could be installed in a python virtual env

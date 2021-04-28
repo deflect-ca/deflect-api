@@ -3,13 +3,18 @@ version: '3.7'
 services:
   web:
     build: .
-    command: python manage.py test
+    command: >
+      sh -c "edge_manage --config deploy/edgemanage/edgemanage.yaml --dnet test &&
+             edge_query --config deploy/edgemanage/edgemanage.yaml --dnet test &&
+             python manage.py test"
     volumes:
       - .:/usr/src/deflect-core/
     ports:
       - 8000:8000
     env_file:
       - ./core/.env
+    depends_on:
+      - db
   db:
     image: mysql:5.7.34
     ports:
