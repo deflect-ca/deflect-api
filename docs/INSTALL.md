@@ -36,13 +36,13 @@ docker compose up -d
 docker compose down
 ```
 
-For error logs:
+For logs:
 
 ```
-docker compose logs web
-docker compose logs db
-docker compose logs nginx
+docker compose logs <web|db|worker|rabbitmq|nginx>
 ```
+
+RabbitMQ Management http://localhost:15672 with account `guest` and `guest`
 
 ### Test in docker
 
