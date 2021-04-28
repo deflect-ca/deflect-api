@@ -26,7 +26,7 @@ FROM python:3.6-buster
 RUN mkdir -p /home/deflect-core
 
 # create the deflect-core user
-RUN addgroup -S deflect-core && adduser -S deflect-core -G deflect-core
+RUN adduser deflect-core
 
 # create the appropriate directories
 ENV HOME=/home/deflect-core
@@ -41,7 +41,7 @@ RUN pip install --no-cache /wheels/*
 COPY ./edgemanage3 edgemanage3
 RUN cd edgemanage3 && python setup.py install
 
-COPY ./entrypoint.prod.sh $APP_HOME
+COPY ./entrypoint.sh $APP_HOME
 
 # copy project
 COPY . $APP_HOME
@@ -52,4 +52,4 @@ RUN chown -R deflect-core:deflect-core $APP_HOME
 # change to the app user
 USER deflect-core
 
-ENTRYPOINT ["/usr/src/deflect-core/entrypoint.sh"]
+ENTRYPOINT ["/home/deflect-core/web/entrypoint.sh"]
