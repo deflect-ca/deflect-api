@@ -20,6 +20,16 @@ cp core/.env.example core/.env
 docker compose up --build
 ```
 
+### Test in docker
+
+Change the `web` section in `docker-compose` to:
+```
+command: >
+  sh -c "edge_manage --config deploy/edgemanage/edgemanage.yaml --dnet dnet1 &&
+         edge_query --config deploy/edgemanage/edgemanage.yaml --dnet dnet1 &&
+         python manage.py test --noinput"
+```
+
 ## Development
 
 Deflect core could be installed in a python virtual env

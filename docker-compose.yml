@@ -3,10 +3,7 @@ version: '3.7'
 services:
   web:
     build: .
-    command: >
-      sh -c "edge_manage --config deploy/edgemanage/edgemanage.yaml --dnet dnet1 &&
-             edge_query --config deploy/edgemanage/edgemanage.yaml --dnet dnet1 &&
-             python manage.py test --noinput"
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/usr/src/deflect-core/
     ports:
@@ -24,5 +21,5 @@ services:
     volumes:
       - ./deploy/docker/mysql:/var/lib/mysql
     environment:
-      MYSQL_DATABASE: deflect-core-ci
+      MYSQL_DATABASE: deflect-core
       MYSQL_ROOT_PASSWORD: password

@@ -17,3 +17,5 @@ RUN cd edgemanage3 && python setup.py install
 
 # copy project
 COPY . .
+
+ENTRYPOINT ["/usr/src/deflect-core/entrypoint.sh"]
