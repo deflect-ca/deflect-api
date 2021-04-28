@@ -17,6 +17,14 @@ cp core/.env.example core/.env
 docker compose up -d --build
 ```
 
+Several container will be launched by using the above command:
+
+- web: django app
+- db: mysql, exposing 3306
+- nginx: reverse proxy, exposing port 80
+- rabbitmq: celery queue, exposing port 5672 and 15672
+- worker: celery
+
 ### Setup
 
 If you are launching deflect-core for the first time, it is required to migrate the database and collect the static file, as well as setting up an admin account
@@ -43,6 +51,7 @@ docker compose logs <web|db|worker|rabbitmq|nginx>
 ```
 
 RabbitMQ Management http://localhost:15672 with account `guest` and `guest`
+
 
 ### Test in docker
 
