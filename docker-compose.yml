@@ -44,7 +44,7 @@ services:
 
   worker:
     build: .
-    command: sh -c "wait-for-it rabbitmq:5672 && wait-for-it web:8000 -- celery -A core worker -l info"
+    command: sh -c "wait-for-it -t 30 rabbitmq:5672 && wait-for-it web:8000 -- celery -A core worker -l info"
     depends_on:
       - rabbitmq
       - db
