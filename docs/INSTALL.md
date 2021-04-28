@@ -61,7 +61,7 @@ command: >
 2. Django 3.1
 3. Django REST framework 3.11.1
 4. MySQL 5.7 or above (JSON support)
-5. RabbitMQ 3.8.11
+5. RabbitMQ 3.8
 
 ## Development
 

@@ -3,33 +3,52 @@ version: '3.7'
 services:
   web:
     build: .
-    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    command: sh -c "wait-for-it db:3306 -- gunicorn core.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - static_volume:/home/deflect-core/web/static
     ports:
       - 8000
     env_file:
       - ./core/.env
+    image: app-image
     depends_on:
       - db
+
   db:
     image: mysql:5.7.34
     ports:
      - 3306:3306
     command: --default-authentication-plugin=mysql_native_password
-    restart: always
+    restart: on-failure
     volumes:
       - mysql_volume:/var/lib/mysql
     environment:
       MYSQL_DATABASE: deflect-core
       MYSQL_ROOT_PASSWORD: password
+
   nginx:
     build: ./deploy/nginx
     ports:
       - 80:80
     volumes:
       - static_volume:/home/deflect-core/web/static
+    restart: on-failure
     depends_on:
+      - web
+
+  rabbitmq:
+    image: rabbitmq:3.8.14-management
+    restart: on-failure
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  worker:
+    image: app-image
+    command: sh -c "wait-for-it rabbitmq:5672 && wait-for-it app:8000 -- celery -A mysite worker -l info"
+    depends_on:
+      - rabbitmq
+      - db
       - web
 
 volumes:

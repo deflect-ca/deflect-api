@@ -35,7 +35,7 @@ RUN mkdir $APP_HOME
 RUN mkdir $APP_HOME/static
 WORKDIR $APP_HOME
 
-RUN apt-get update && apt-get install -y bind9utils netcat
+RUN apt-get update && apt-get install -y bind9utils netcat wait-for-it
 COPY --from=builder /usr/src/deflect-core/wheels /wheels
 COPY --from=builder /usr/src/deflect-core/requirements.txt .
 RUN pip install --no-cache /wheels/*
@@ -52,5 +52,3 @@ RUN chown -R deflect-core:deflect-core $APP_HOME
 
 # change to the app user
 USER deflect-core
-
-ENTRYPOINT ["/home/deflect-core/web/entrypoint.sh"]
