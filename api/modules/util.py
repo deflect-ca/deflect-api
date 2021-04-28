@@ -63,5 +63,5 @@ def model_post_save(delete=False, **kwargs):
         logger.debug("Website deleted, trigger next in mode = full")
         next_mode = 'full'
 
-    async_id = gen_site_config_task.delay(next_mode)
+    async_id = gen_site_config_task.delay(_next=next_mode)
     logger.info(f"Trigger task ID: {async_id}, next_mode: {next_mode}")

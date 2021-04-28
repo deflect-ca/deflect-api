@@ -15,5 +15,5 @@ class GenSiteConfig(APIView):
 
     def get(self, request):
         """ Invoke gen_site_config task in celery """
-        async_id = gen_site_config_task.delay()
+        async_id = gen_site_config_task.delay(_next=False)
         return Response({"async_id": str(async_id)})
