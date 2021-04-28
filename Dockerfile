@@ -42,8 +42,6 @@ RUN pip install --no-cache /wheels/*
 COPY ./edgemanage3 edgemanage3
 RUN cd edgemanage3 && python setup.py install
 
-COPY ./entrypoint.sh $APP_HOME
-
 # copy project
 COPY . $APP_HOME
 
