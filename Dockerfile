@@ -32,6 +32,7 @@ RUN adduser deflect-core
 ENV HOME=/home/deflect-core
 ENV APP_HOME=/home/deflect-core/web
 RUN mkdir $APP_HOME
+RUN mkdir $APP_HOME/static
 WORKDIR $APP_HOME
 
 RUN apt-get update && apt-get install -y bind9utils netcat
