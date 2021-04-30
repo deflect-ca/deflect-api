@@ -24,7 +24,8 @@ def edge_query(dnet=None):
     try:
         edgemanage_adapter = EdgemanageAdapter(
             settings.EDGEMANAGE_CONFIG, dnet or settings.EDGEMANAGE_DNET)
-    except FileNotFoundError:
+    except Exception as err:
+        logging.error(str(err))
         raise KeyError('edge_query: dnet %s not found' % dnet)
 
     now = time.time()
@@ -135,7 +136,8 @@ def dnet_query():
         edgemanage_adapter = EdgemanageAdapter(
             settings.EDGEMANAGE_CONFIG)
         dnets = edgemanage_adapter.dnet_query()
-    except FileNotFoundError:
+    except Exception as err:
+        logging.error(str(err))
         raise FileNotFoundError('dnet_query: edgemanage error')
 
     return dnets

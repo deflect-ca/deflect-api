@@ -39,11 +39,14 @@ RUN apt-get update && apt-get install -y bind9utils netcat wait-for-it
 COPY --from=builder /usr/src/deflect-core/wheels /wheels
 COPY --from=builder /usr/src/deflect-core/requirements.txt .
 RUN pip install --no-cache /wheels/*
-COPY ./edgemanage3 edgemanage3
-RUN cd edgemanage3 && python setup.py install
 
 # copy project
 COPY . $APP_HOME
+
+# Submodule
+ENV PYTHONPATH "${PYTHONPATH}:/home/deflect-core/edgemanage3:/home/deflect-core/deflect-next"
+RUN cd edgemanage3 && python setup.py install
+RUN pip install -r deflect_next/orchestration/requirements.txt
 
 # chown all the files to the deflect-core user
 RUN chown -R deflect-core:deflect-core $APP_HOME

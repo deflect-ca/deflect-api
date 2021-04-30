@@ -3,8 +3,10 @@ version: '3.7'
 services:
   web:
     build: .
+    # command: sh -c "wait-for-it db:3306 -- python manage.py runserver 0.0.0.0:8000"
     command: sh -c "wait-for-it db:3306 -- gunicorn core.wsgi:application --bind 0.0.0.0:8000"
     volumes:
+      # - .:/home/deflect-core/web
       - static_volume:/home/deflect-core/web/static
     ports:
       - 8000
