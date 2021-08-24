@@ -5,3 +5,6 @@
 [submodule "deflect_next"]
 	path = deflect_next
 	url = git@github.com:equalitie/deflect-next.git
+[submodule "deflect_next_orchestration"]
+	path = deflect_next_orchestration
+	url = git@github.com:equalitie/deflect-next-orchestration.git

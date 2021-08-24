@@ -46,7 +46,7 @@ COPY . $APP_HOME
 # Submodule
 ENV PYTHONPATH "${PYTHONPATH}:/home/deflect-core/edgemanage3:/home/deflect-core/deflect-next"
 RUN cd edgemanage3 && python setup.py install
-RUN pip install -r deflect_next/orchestration/requirements.txt
+RUN cd deflect_next_orchestration && pip install .
 
 # chown all the files to the deflect-core user
 RUN chown -R deflect-core:deflect-core $APP_HOME

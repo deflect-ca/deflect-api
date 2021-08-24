@@ -83,7 +83,7 @@ Two git submodule, including `edgemanage` and `deflect-next` should be init and 
 
     git submodule update --init
     cd edgemanage3 && python setup.py install
-    cd deflect_next/orchestration && pip install -r requirements.txt
+    cd deflect_next_orchestration && pip install -e .
 
 After that, we could setup deflect-core, edit `.env` and setup database
 

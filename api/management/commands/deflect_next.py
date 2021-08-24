@@ -1,4 +1,5 @@
 from datetime import datetime
+from pyaml_env import parse_config
 
 import os
 import time
@@ -8,19 +9,14 @@ import ssh_agent_setup
 
 from django.core.management.base import BaseCommand
 from api.models import Edge
-
-from deflect_next.orchestration import old_to_new_site_dict
-from deflect_next.orchestration import install_delta_config
-from deflect_next.orchestration import generate_bind_config
-from deflect_next.orchestration import decrypt_and_verify_cert_bundles
-from deflect_next.orchestration import generate_nginx_config
-from deflect_next.orchestration import generate_banjax_next_config
+from deflect_next_orchestration.orchestration.install_delta_config import install_delta_config
 
 logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
     help = 'Execute deflect-next functions'
+    origin_work_dir = None
 
     def add_arguments(self, parser):
         # Named (optional) arguments
@@ -37,16 +33,29 @@ class Command(BaseCommand):
             help='system sites.yml file'
         )
         parser.add_argument(
-            '-m', '--mode',
-            default='full',
-            help='Default is not gen only mode'
-        )
-        parser.add_argument(
             '-k', '--key',
             help='SSH key file path'
         )
+        parser.add_argument(
+            '-n', '--nextconf',
+            help='Deflect next config file'
+        )
+
+    def change_workdir(self):
+        if not self.origin_work_dir:
+            self.origin_work_dir = os.getcwd()
+            logger.info(f"Original workdir saved: {self.origin_work_dir}")
+        project_root = os.path.abspath(os.path.dirname(__name__))
+        target = f"{project_root}/deflect_next_orchestration/orchestration"
+        os.chdir(target)
+        logger.info(f"workdir changed to: {os.getcwd()}")
+
+    def restore_workdir(self):
+        os.chdir(self.origin_work_dir)
+        logger.info(f"workdir restored to: {os.getcwd()}")
 
     def load_ssh_key(self, key_path):
+        logger.info(f"load ssh key from: {key_path}")
         ssh_agent_setup.setup()
         ssh_agent_setup.addKey(os.path.expanduser(key_path))
 
@@ -68,61 +77,24 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         self.measure_exec_time()
-        config = {}
-        with open(options['config'], 'r') as file_config:
-            config = yaml.load(file_config.read(), Loader=yaml.FullLoader)
 
-        db_edge_list = self.get_edge_list()
-        if len(db_edge_list) > 0:
-            logger.info(f"config edge_ips:  \t{config['edge_ips']}")
-            config['edge_ips'] = db_edge_list
-            logger.info(f"replaced edge_ips:\t{config['edge_ips']}")
+        config = parse_config(options['config'])
+        old_sites_yml = parse_config(options['sites'])
+        system_sites = parse_config(options['sys'])
+        orchestration_config = parse_config(options['nextconf'])
 
-        logger.info(f"controller_domain:\t{config['controller_domain']}")
-        logger.info(f"controller_ip:    \t{config['controller_ip']}")
-        logger.info(f"edge_ips:         \t{config['edge_ips']}")
-        logger.info(f"output_prefix:    \t{config['output_prefix']}")
-
-        old_sites_yml = {}
-        with open(options['sites'], "r") as file_sites:
-            old_sites_yml = yaml.load(file_sites.read(), Loader=yaml.FullLoader)
-            old_sites_timestamp = old_sites_yml["timestamp"]
-            old_sites = old_sites_yml["remap"]
-
-        timestamp = datetime.fromtimestamp(float(old_sites_yml["timestamp"]) / 1000.0)
-        formatted_time = timestamp.strftime("%Y-%m-%d_%H:%M:%S")
-
-        logger.info('old_to_new_site_dict')
-        new_client_sites = old_to_new_site_dict.main(old_sites, old_sites_timestamp, config)
-
-        system_sites = {}
-        with open(options['sys'], "r") as f:
-            system_sites = yaml.load(f.read(), Loader=yaml.FullLoader)
-
-        all_sites = {'client': new_client_sites, 'system': system_sites}
-
-        logger.info('generate_bind_config')
-        generate_bind_config.main(config, all_sites, formatted_time)
-
-        logger.info('decrypt_and_verify_cert_bundles')
-        decrypt_and_verify_cert_bundles.main(all_sites, formatted_time, config)
-
-        logger.info('generate_nginx_config')
-        generate_nginx_config.main(all_sites, config, formatted_time)
-
-        logger.info('generate_banjax_next_config')
-        generate_banjax_next_config.main(config, all_sites, formatted_time)
-
-        logger.info(f"load ssh key from: {options['key']}")
+        # load ssh key for connecting to controller and edges
         self.load_ssh_key(options['key'])
 
-        if options['mode'] == 'full':
-            logger.info('install_delta_config')
-            install_delta_config.main(config, all_sites, formatted_time, formatted_time)
-        elif options['mode'] == 'edge':
-            logger.info('edge update only')
-            install_delta_config.edges(config, all_sites, formatted_time, formatted_time)
-        else:
-            logger.info('Mode should be set to: full, edge')
+        # Change python workdir to make deflect-next file path work
+        self.change_workdir()
 
+        install_delta_config(
+            config=config,
+            orchestration_config=orchestration_config,
+            preload_old_client_sites=old_sites_yml,
+            preload_system_sites=system_sites,
+        )
+
+        self.restore_workdir()
         self.print_exec_time()
