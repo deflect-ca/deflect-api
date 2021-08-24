@@ -16,10 +16,10 @@ def gen_site_config_task(_next=False, mode=None):
 def deflect_next_task(mode='full'):
     call_command(
         'deflect_next',
-        output=settings.NEXT_OUTPUT_PREFIX,
         config=settings.NEXT_CONFIG,
+        nextconf=settings.NEXT_DN_CONFIG,
         sys=settings.NEXT_SYS_SITES,
         key=settings.NEXT_SSH_KEY,
-        sites='dev/deflect_next/input/site-next4.yml',
+        sites='dev/deflect_next_orchestration/input/current/old-sites.yml',
         mode=mode
     )

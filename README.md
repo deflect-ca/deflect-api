@@ -54,7 +54,7 @@ D       | dnet          | edgemanage update    |
 
 In this table, subject could represent HTTP API endpoint, or operation via django admin. Once the action of the verb, for example, C (create), was committed, the 1st reaction will be trigger right away. Depending on the category, the second reaction will be triggered after the first reaction was complete.
 
-Most long running task are triggered by celery worker, such as `gen_site_config` and `deflect_next`.
+Most long running task are triggered by celery worker, such as `gen_site_config` and `deflect_next`. This could be config in `.env` by setting `GSC_TRIGGER_UPON_DB_CHANGE`
 
 Footnotes:
 

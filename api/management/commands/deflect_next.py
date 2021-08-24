@@ -40,6 +40,12 @@ class Command(BaseCommand):
             '-n', '--nextconf',
             help='Deflect next config file'
         )
+        # TODO: mode is unused for now, preserve for later
+        parser.add_argument(
+            '-m', '--mode',
+            default='full',
+            help='Default is not gen only mode'
+        )
 
     def change_workdir(self):
         if not self.origin_work_dir:
