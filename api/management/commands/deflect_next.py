@@ -91,7 +91,9 @@ class Command(BaseCommand):
 
         install_delta_config(
             config=config,
-            orchestration_config=orchestration_config
+            orchestration_config=orchestration_config,
+            preload_old_client_sites=old_sites_yml,
+            preload_system_sites=system_sites,
         )
 
         self.restore_workdir()
