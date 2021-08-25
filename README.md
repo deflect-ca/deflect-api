@@ -1,6 +1,6 @@
-# Deflect Core
+# Deflect API
 
-This project serves as the core of Deflect, several componenet is integrated within this project including edgemanage, database for storing DNS and website record, API and gen_site_config module.
+This project serves as the API interface to Deflect. Several componenets are integrated within this project including edgemanage, a database for storing DNS and website records, as well as the API and gen_site_config module.
 
 ## System diagram
 
@@ -8,7 +8,7 @@ This project serves as the core of Deflect, several componenet is integrated wit
 
 ## Overview
 
-- Deflect-core is based on Django framework
+- Deflect-API is based on Django framework
 - Uses MySQL as database to store:
   - Website list (URL, origin IP)
   - Website options and config
@@ -41,7 +41,7 @@ This project serves as the core of Deflect, several componenet is integrated wit
 
 ## Integration
 
-Deflect-core has several integration mechanism in place, this table is a breif overview of how everything work together:
+Deflect-API has several integration mechanisms in place. This table is a breif overview of how everything works together:
 
 verb    | subject       | 1st reaction         | 2nd reaction
 --------| --------------|----------------------|-------------------------
@@ -52,9 +52,9 @@ D       | edge          | edgemanage update    | `docker prune`
 C       | dnet          | edgemanage update    |
 D       | dnet          | edgemanage update    |
 
-In this table, subject could represent HTTP API endpoint, or operation via django admin. Once the action of the verb, for example, C (create), was committed, the 1st reaction will be trigger right away. Depending on the category, the second reaction will be triggered after the first reaction was complete.
+In this table, subject could represent HTTP API endpoints, or operations via django admin. Once the action of the verb, for example, C (create), is committed, the 1st reaction will be triggered right-away. Depending on the category, the second reaction will be triggered after the first reaction is complete.
 
-Most long running task are triggered by celery worker, such as `gen_site_config` and `deflect_next`. This could be config in `.env` by setting `GSC_TRIGGER_UPON_DB_CHANGE`
+Most long running task are triggered by a celery worker, such as `gen_site_config` and `deflect_next`. This could be config in `.env` by setting `GSC_TRIGGER_UPON_DB_CHANGE`
 
 Footnotes:
 
@@ -77,7 +77,7 @@ Please refer to [HTTP API Documentation](https://equalitie.github.io/deflect-cor
 
 #### **deflect_next**
 
-This command calls `deflect-next` function to perform edge related operation from the command line.
+This command calls `deflect-next` function to perform edge related operations from the command line.
 
     python manage.py deflect_next --sites <path-to-site-yml> -sys <path-to-system-yml> --nextconf <path-to-next-config> --config <path-to-config-yml> --key <ssh_private_key> --mode <edge|full>
 
