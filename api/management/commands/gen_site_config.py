@@ -85,13 +85,15 @@ class Command(BaseCommand):
 
         partition_config = settings.GSC_PARTITIONS
         partition_to_sites = self.partition_dnets(partition_config, all_data)
+        latest_site_yml = []
         for partition, sites in partition_to_sites.items():
             logger.info("number of sites in partition '%s': %s", partition, len(sites))
-            self.write_config_if_changed(sites, os.path.join(output_location, partition), debug)
+            latest_site_yml.append(self.write_config_if_changed(
+                sites, os.path.join(output_location, partition), debug))
 
-        # chain reaction
-        if options['next']:
-            deflect_next_task.delay(options['mode'])
+        if latest_site_yml and options['next']:
+            logger.info('trigger deflect-next chain reaction %s', latest_site_yml)
+            deflect_next_task.delay(mode=options['mode'], sites=latest_site_yml[0])
 
 
     def generate_site_file(self, blacklist_path, debug):
@@ -579,7 +581,8 @@ class Command(BaseCommand):
         if os.path.exists(os.path.join(output_directory, "site.yml")):
             os.remove(os.path.join(output_directory, "site.yml"))
 
-        os.symlink(new_filepath, os.path.join(output_directory, "site.yml"))
+        latest_site_yml = os.path.join(output_directory, "site.yml")
+        os.symlink(new_filepath, latest_site_yml)
 
         logger.info("Generated updated site.yml at %s", new_filepath)
 
@@ -591,6 +594,8 @@ class Command(BaseCommand):
         except Exception:
             logger.error("Something wrong with YamlDiff")
             logger.error("%s", traceback.format_exc())
+
+        return latest_site_yml
 
     def get_most_recent_config(self, output_location):
         configs = sorted(glob.glob(output_location + "/*.site.yml"))

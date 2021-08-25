@@ -84,6 +84,7 @@ class Command(BaseCommand):
 
         self.measure_exec_time()
 
+        logger.info(options)
         config = parse_config(options['config'])
         old_sites_yml = parse_config(options['sites'])
         system_sites = parse_config(options['sys'])
