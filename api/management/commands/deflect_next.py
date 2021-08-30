@@ -4,11 +4,11 @@ from pyaml_env import parse_config
 import os
 import time
 import logging
-import yaml
+import json
 import ssh_agent_setup
 
 from django.core.management.base import BaseCommand
-from api.models import Edge
+from api.models import Edge, Dnet
 from deflect_next_orchestration.orchestration.install_delta_config import install_delta_config
 
 logger = logging.getLogger(__name__)
@@ -71,21 +71,59 @@ class Command(BaseCommand):
     def print_exec_time(self):
         logger.info("--- %s seconds ---" % (time.time() - self.start_time))
 
-    def get_edge_list(self):
+    def get_dnets(self):
+        dnets = Dnet.objects.all()
+        dlist = []
+        for dnet in dnets:
+            dlist.append(dnet.name)
+        return dlist
+
+    def get_edge_list(self, controller_ip):
         edges = Edge.objects.all()
-        edge_list = []
+        partial_config = {
+            'edge_names_to_ips': {},
+            'edge_names_to_dnets': {},
+            'dnets_to_edges': {}
+        }
 
         for edge in edges:
-            edge_list.append(edge.ip)
+            partial_config['edge_names_to_ips'][edge.hostname] = edge.ip
+            partial_config['edge_names_to_dnets'][edge.hostname] = edge.dnet.name
+            if edge.dnet.name in partial_config['dnets_to_edges']:
+                partial_config['dnets_to_edges'][edge.dnet.name].append(edge.hostname)
+            else:
+                partial_config['dnets_to_edges'][edge.dnet.name] = [edge.hostname]
 
-        return edge_list
+        # add empty dnet
+        dnets = self.get_dnets()
+        for dnet in dnets:
+            if dnet not in partial_config['dnets_to_edges']:
+                partial_config['dnets_to_edges'][dnet] = []
+
+        # add controller
+        partial_config['dnets_to_edges']['controller'] = ['controller']
+        partial_config['edge_names_to_ips']['controller'] = controller_ip
+
+        return partial_config
 
     def handle(self, *args, **options):
 
         self.measure_exec_time()
 
-        logger.info(options)
         config = parse_config(options['config'])
+        # override config edge/dnet settings with DB
+        partial_config = self.get_edge_list(controller_ip=config['controller_ip'])
+        config['edge_names_to_ips'] = partial_config['edge_names_to_ips']
+        config['edge_names_to_dnets'] = partial_config['edge_names_to_dnets']
+        config['dnets_to_edges'] = partial_config['dnets_to_edges']
+
+        logger.debug(options)
+        logger.debug(json.dumps([
+            config['edge_names_to_ips'],
+            config['edge_names_to_dnets'],
+            config['dnets_to_edges']
+        ], indent=2))
+
         old_sites_yml = parse_config(options['sites'])
         system_sites = parse_config(options['sys'])
         orchestration_config = parse_config(options['nextconf'])
