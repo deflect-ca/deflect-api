@@ -1,6 +1,6 @@
 # Deflect API
 
-This project serves as the API interface to Deflect. Several componenets are integrated within this project including edgemanage, a database for storing DNS and website records, as well as the API and gen_site_config module.
+This project serves as the API interface to Deflect. Several components are integrated within this project including edgemanage, a database for storing DNS and website records, as well as the API and gen_site_config module.
 
 ## System diagram
 
