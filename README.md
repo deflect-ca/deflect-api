@@ -4,7 +4,7 @@ This project serves as the API interface to Deflect. Several components are inte
 
 ## System diagram
 
-![deflect-core-diagram](https://user-images.githubusercontent.com/1984426/164417802-e6b21c52-8da0-4b88-a6ae-5250a9db9dae.jpg)
+![system-diagram-new](https://user-images.githubusercontent.com/1984426/164418270-0fddc429-29e5-4e4d-be2f-664f6ead708d.jpg)
 
 ## Overview
 
