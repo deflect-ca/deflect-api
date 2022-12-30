@@ -19,25 +19,15 @@ This project serves as the API interface to Deflect. Several components are inte
 - gen_site_config script (django command line script) generates site.yml according to database
 - Provides an HTTP API to interact with database
 - Provides an Web interface to interact with database (django admin)
-- Works with two submodules (highlighted in the diagram above)
+- Works with one submodules (highlighted in the diagram above)
   - edgemanage3
-  - deflect-next
 - edgemanage3:
   - python integration
   - feature:
     - edge_query: query edge status
     - edge_conf: configure edge
     - edge_manage: cronjob to execute every min
-- deflect-next
-  - python integration
-  - triggers when there is an change in the database
-  - input
-    - config.yml (according to DB, get a list of edge IP)
-    - site.yml (generated with gen_site_config)
-  - features
-    - push new site.yml to deflect-next network
-    - provision new deflect-next edge
-    - provision new deflect-next controller
+
 
 ## Integration
 
@@ -45,16 +35,16 @@ Deflect-API has several integration mechanisms in place. This table is a breif o
 
 verb    | subject       | 1st reaction         | 2nd reaction
 --------| --------------|----------------------|-------------------------
-CD[1]   | website[3]    | `gen_site_config`    | `deflect_next(mode=full)`
-U[2]    | website       | `gen_site_config`    | `deflect_next(mode=edge)`
-CU      | edge          | edgemanage update[4] | `deflect_next(mode=full)`
+CD[1]   | website[3]    | `gen_site_config`    |
+U[2]    | website       | `gen_site_config`    |
+CU      | edge          | edgemanage update[4] |
 D       | edge          | edgemanage update    | `docker prune`
 C       | dnet          | edgemanage update    |
 D       | dnet          | edgemanage update    |
 
 In this table, subject could represent HTTP API endpoints, or operations via django admin. Once the action of the verb, for example, C (create), is committed, the 1st reaction will be triggered right-away. Depending on the category, the second reaction will be triggered after the first reaction is complete.
 
-Most long running task are triggered by a celery worker, such as `gen_site_config` and `deflect_next`. This could be config in `.env` by setting `GSC_TRIGGER_UPON_DB_CHANGE`
+Most long running task are triggered by a celery worker, such as `gen_site_config`. This could be config in `.env` by setting `GSC_TRIGGER_UPON_DB_CHANGE`
 
 Footnotes:
 
@@ -74,28 +64,6 @@ Please refer to [INSTALL.md](docs/INSTALL.md)
 Please refer to [HTTP API Documentation](https://equalitie.github.io/deflect-core/)
 
 ### Django command line
-
-#### **deflect_next**
-
-This command calls `deflect-next` function to perform edge related operations from the command line.
-
-    python manage.py deflect_next --sites <path-to-site-yml> -sys <path-to-system-yml> --nextconf <path-to-next-config> --config <path-to-config-yml> --key <ssh_private_key> --mode <edge|full>
-
-Please refer to [deflect-next](https://github.com/equalitie/deflect-next-orchestration) repository for more information on setting up required config file.
-
-A real domain with the following DNS settings is also required:
-
-    ns1.next.example.com.	3600	IN	A	0.0.0.0
-    ns2.next.example.com.	3600	IN	A	0.0.0.0
-    next.example.com.	3600	IN	NS	ns1.next.example.com.
-
-A SSH private key is required to connect to the remote host (edges and controller)
-
-Please be aware of the `--mode` option, which could be either `edge` or `full`.
-
-- edge mode: Only connect to all edges in the database to execute `install_nginx_config` and `install_banjax_next_config`. Typically for updating `site.yml`
-- full mode: Connects to both edges and controller to do a full install
-
 
 #### **gen_site_config**
 

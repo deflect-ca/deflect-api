@@ -44,9 +44,8 @@ RUN pip install --no-cache /wheels/*
 COPY . $APP_HOME
 
 # Submodule
-ENV PYTHONPATH "${PYTHONPATH}:/home/deflect-core/edgemanage3:/home/deflect-core/deflect-next"
+ENV PYTHONPATH "${PYTHONPATH}:/home/deflect-core/edgemanage3"
 RUN cd edgemanage3 && python setup.py install
-RUN cd deflect_next_orchestration && pip install .
 
 # chown all the files to the deflect-core user
 RUN chown -R deflect-core:deflect-core $APP_HOME
