@@ -19,9 +19,6 @@ jobs:
           name: Install edgemanage
           command: cd edgemanage3 && sudo python setup.py install
       - run:
-          name: Install deflect_next
-          command: cd deflect_next_orchestration && pip install .
-      - run:
           name: Init edgemanage
           command: edge_manage --config tests/edgemanage/edgemanage.yaml --dnet test
       - run:

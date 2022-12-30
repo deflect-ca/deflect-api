@@ -4,7 +4,6 @@ from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save, post_delete
 from api.modules.edgemanage import update_dnet_edges
-from core.tasks import deflect_next_task
 
 logger = logging.getLogger(__name__)
 
@@ -27,12 +26,9 @@ class Edge(models.Model):
         """
         Edge list updated
         1. update edgemanage files
-        2. call deflect_next
         """
         logging.debug(kwargs)
         update_dnet_edges(Edge.get_mapping())
-        if settings.NEXT_TRIGGER_UPON_DB_CHANGE:
-            deflect_next_task.delay(mode='full')
 
     @staticmethod
     def post_delete(**kwargs):

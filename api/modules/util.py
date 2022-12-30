@@ -52,16 +52,5 @@ def model_post_save(delete=False, **kwargs):
         logger.info('GSC_TRIGGER_UPON_DB_CHANGE = False')
         return
 
-    # Call deflect_next in edge update mode by default
-    next_mode = 'edge'
-
-    # Call deflect_next in full mode when new site is created
-    if kwargs.get('created') and str(kwargs.get('sender')) == "<class 'api.models.website.Website'>":
-        logger.debug("New website created, trigger next in mode = full")
-        next_mode = 'full'
-    elif delete:
-        logger.debug("Website deleted, trigger next in mode = full")
-        next_mode = 'full'
-
-    async_id = gen_site_config_task.delay(_next=next_mode)
-    logger.info(f"Trigger task ID: {async_id}, next_mode: {next_mode}")
+    async_id = gen_site_config_task.delay()
+    logger.info(f"Trigger task ID: {async_id}")

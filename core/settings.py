@@ -245,12 +245,3 @@ GSC_TRIGGER_UPON_DB_CHANGE = env('GSC_TRIGGER_UPON_DB_CHANGE', default=False)
 # Celery
 CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='amqp://localhost')
 CELERY_RESULT_BACKEND = 'django-db'
-
-# Deflect Next
-NEXT_CONFIG = env('NEXT_CONFIG', default='dev/deflect_next_orchestration/input/config.yml')
-NEXT_SYS_SITES = env(
-    'NEXT_SYS_SITES', default='dev/deflect_next_orchestration/input/system-sites.yml')
-NEXT_DN_CONFIG = env(
-    'NEXT_DN_CONFIG', default='dev/deflect_next_orchestration/input/deflect-next_config.yaml')
-NEXT_SSH_KEY = env('NEXT_SSH_KEY', default='~/.ssh/id_rsa')
-NEXT_TRIGGER_UPON_DB_CHANGE = env('NEXT_TRIGGER_UPON_DB_CHANGE', default=False)

@@ -9,7 +9,6 @@ from django.conf import settings
 
 from api.modules.util import CustomSchema
 from api.modules.edgemanage import edge_query, edge_conf, dnet_query
-from core.tasks import deflect_next_task
 
 
 logger = logging.getLogger(__name__)
